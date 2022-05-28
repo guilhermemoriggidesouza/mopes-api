@@ -1,0 +1,35 @@
+version: "3.5"
+
+networks:
+    qyon_crm_local_network:
+        external:
+            name: keyad_db
+
+services:
+    db:
+        container_name: pg_container
+        networks:
+            qyon_crm_local_network:
+                aliases:
+                    - db
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: root
+            POSTGRES_DB: keyad_db
+        ports:
+            - "5432:5432"
+    pgadmin:
+        container_name: pgadmin4_container
+        networks:
+            qyon_crm_local_network:
+                aliases:
+                    - sgbd
+        image: dpage/pgadmin4
+        restart: always
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@admin.com
+            PGADMIN_DEFAULT_PASSWORD: root
+        ports:
+            - "5050:80"
