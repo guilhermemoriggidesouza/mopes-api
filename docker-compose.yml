@@ -1,15 +1,15 @@
 version: "3.5"
 
 networks:
-    qyon_crm_local_network:
+    mope_net:
         external:
-            name: keyad_db
+            name: mope
 
 services:
     db:
         container_name: pg_container
         networks:
-            qyon_crm_local_network:
+            mope_net:
                 aliases:
                     - db
         image: postgres
@@ -17,13 +17,13 @@ services:
         environment:
             POSTGRES_USER: root
             POSTGRES_PASSWORD: root
-            POSTGRES_DB: keyad_db
+            POSTGRES_DB: mope
         ports:
             - "5432:5432"
     pgadmin:
         container_name: pgadmin4_container
         networks:
-            qyon_crm_local_network:
+            mope_net:
                 aliases:
                     - sgbd
         image: dpage/pgadmin4
