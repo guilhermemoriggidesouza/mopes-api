@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { User } from './User.entity';
-import { UserService } from './User.service';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from './user.entity';
+import { UserService } from './user.service';
 const urlBase: string = "/user"
 
 @Controller()
+@UseGuards(JwtAuthGuard)
 export class UserController {
     constructor(private readonly userService: UserService) { }
 
@@ -14,7 +16,7 @@ export class UserController {
 
     @Get(`${urlBase}/:id`)
     async findOne(@Param("id") id: string): Promise<User> {
-        return await this.userService.findOne(id);
+        return await this.userService.findOne({ id });
     }
 
     @Post(`${urlBase}`)
