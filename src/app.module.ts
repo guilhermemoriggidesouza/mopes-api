@@ -19,6 +19,6 @@ import config from './config';
             entities: [User],
             synchronize: true,
         }),
-    ],
+    ]
 })
 export class AppModule { }
