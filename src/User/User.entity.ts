@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Org } from './../org/Org.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class User {
@@ -19,5 +20,10 @@ export class User {
 
     @Column({ default: 'player', nullable: true })
     role: string;
+    
+    @ManyToOne(() => Org, (user) => user.users)
+    org: Org
 
+    @Column({nullable: true})
+    orgId: number;
 }
