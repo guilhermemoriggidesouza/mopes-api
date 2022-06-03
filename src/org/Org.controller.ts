@@ -27,12 +27,10 @@ export class OrgController {
     @Post(`${urlBase}`)
     @Roles(Role.Admin)
     async createOrg(@Body() payload: Org, @Request() req: any): Promise<Org> {
-        console.log(req.user)
         return await this.orgService.create(payload, req.user.id);
     }
 
     @Post(`${urlBase}/:id`)
-    @Roles(Role.Player)
     @Roles(Role.Admin)
     async editOrgs(@Param("id") id: string, @Body() payload: Org): Promise<object> {
         return await this.orgService.edit(id, (payload as object));

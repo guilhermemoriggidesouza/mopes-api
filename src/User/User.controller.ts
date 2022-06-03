@@ -19,8 +19,7 @@ export class UserController {
     }
     
     @Get(`${urlBase}/:id`)
-    @Roles(Role.Player)
-    @Roles(Role.Admin)
+    @Roles(Role.Player, Role.Admin)
     async findOne(@Param("id") id: string): Promise<User> {
         return await this.userService.findOne({ id });
     }

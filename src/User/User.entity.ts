@@ -1,5 +1,6 @@
+import { Team } from './../team/Team.entity';
 import { Org } from './../org/Org.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity()
 export class User {
@@ -23,6 +24,9 @@ export class User {
     
     @ManyToOne(() => Org, (user) => user.users)
     org: Org
+
+    @OneToMany(() => Team, team => team.creator)
+    teamsCreated: Team[];
 
     @Column({nullable: true})
     orgId: number;

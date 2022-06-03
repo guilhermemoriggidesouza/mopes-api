@@ -6,11 +6,14 @@ import { UserModule } from './user/user.module';
 import config from './config';
 import { Org } from './org/Org.entity';
 import { OrgModule } from './org/Org.module';
+import { TeamModule } from './team/Team.module';
+import { Team } from './team/Team.entity';
 
 @Module({
     imports: [
         AuthModule,
         UserModule,
+        TeamModule,
         OrgModule,
         TypeOrmModule.forRoot({
             type: 'postgres',
@@ -19,7 +22,7 @@ import { OrgModule } from './org/Org.module';
             username: config.db_username,
             password: config.db_password,
             database: config.db_database,
-            entities: [User, Org],
+            entities: [User, Org, Team],
             synchronize: true,
         }),
     ]

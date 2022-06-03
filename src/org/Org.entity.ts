@@ -9,6 +9,9 @@ export class Org {
     @Column()
     name: string;
     
+    @Column({nullable: true})
+    logo: string;
+    
     @OneToOne(()=> User)
     @JoinColumn()
     owner: User;
@@ -19,6 +22,6 @@ export class Org {
     @OneToMany(() => User, user => user.org)
     users: User[];
 
-    @Column()
+    @Column({default: false})
     payedIntegration: boolean;
 }

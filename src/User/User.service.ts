@@ -21,7 +21,7 @@ export class UserService {
     }
 
     async findOne({ id, where }: { id?: string, where?: object }): Promise<User> {
-        return this.userRepository.findOne(id, { where, relations: ["org"] });
+        return this.userRepository.findOne(id, { where, relations: ["org", "teamsCreated"] });
     }
 
     async remove(id: string): Promise<object> {
