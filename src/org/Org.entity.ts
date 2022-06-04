@@ -16,7 +16,7 @@ export class Org {
     @JoinColumn()
     owner: User;
 
-    @Column()
+    @Column({nullable: true})
     ownerId: number;
 
     @OneToMany(() => User, user => user.org)

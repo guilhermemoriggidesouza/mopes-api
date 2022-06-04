@@ -1,16 +1,21 @@
-import { Dependencies, Injectable } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { UserService } from 'src/user/user.service';
+import { PlayerService } from './../player/Player.service';
+import { Player } from 'src/player/Player.entity';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Team } from './Team.entity';
+import { User } from 'src/user/user.entity';
 
 @Injectable()
-@Dependencies(getRepositoryToken(Team))
 export class TeamService {
-    teamRepository: Repository<Team>;
 
-    constructor(teamRepository: Repository<Team>) {
-        this.teamRepository = teamRepository;
-    }
+    constructor(
+        private playerService: PlayerService,
+        private userService: UserService,
+        @InjectRepository(Team)
+        private teamRepository: Repository<Team>
+    ) { }
 
     async create(Team: Team, creatorId: number): Promise<Team> {
         return this.teamRepository.save({ ...Team, creatorId })
@@ -21,15 +26,36 @@ export class TeamService {
     }
 
     async findOne({ id, where }: { id?: string, where?: object }): Promise<Team> {
-        return this.teamRepository.findOne(id, { where, relations: ["creator", "coach"] });
+        return this.teamRepository.findOne(id, { where, relations: ["players", "players.user", "coach"] });
     }
 
     async remove(id: string): Promise<object> {
         return await this.teamRepository.delete(id);
     }
 
-    async edit(id: string, payload: object): Promise<object> {
+    async edit(id: string, payload: any): Promise<object> {
+        await this.savePlayers({ players: payload.players, teamId: parseInt(id) })
+        payload.coachId = await this.saveCoach(payload.coach)
+        delete payload.players
+        delete payload.coach
         return await this.teamRepository.update(id, payload);
+    }
+
+    async saveCoach(user: User): Promise<number> {
+        const userCreated = await this.userService.create(user)
+        return userCreated.id
+    }
+
+    async savePlayers({ players, teamId }: { players: Player[], teamId: number }) {
+        if (players && teamId) {
+            players = await Promise.all(players.map(async (player) => {
+                return {
+                    ...player,
+                    teamId
+                }
+            }))
+            await this.playerService.createMany(players)
+        }
     }
 
 }

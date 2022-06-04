@@ -1,16 +1,15 @@
 import { Dependencies, Injectable } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 
 @Injectable()
-@Dependencies(getRepositoryToken(User))
 export class UserService {
-    userRepository: Repository<User>;
 
-    constructor(userRepository: Repository<User>) {
-        this.userRepository = userRepository;
-    }
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>
+    ) { }
 
     async create(User: User): Promise<User> {
         return this.userRepository.save(User)

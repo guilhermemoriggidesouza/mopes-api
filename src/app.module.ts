@@ -1,3 +1,4 @@
+import { Player } from './player/Player.entity';
 import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,13 +9,10 @@ import { Org } from './org/Org.entity';
 import { OrgModule } from './org/Org.module';
 import { TeamModule } from './team/Team.module';
 import { Team } from './team/Team.entity';
+import { PlayerModule } from './player/Player.module';
 
 @Module({
     imports: [
-        AuthModule,
-        UserModule,
-        TeamModule,
-        OrgModule,
         TypeOrmModule.forRoot({
             type: 'postgres',
             host: config.db_host,
@@ -22,9 +20,14 @@ import { Team } from './team/Team.entity';
             username: config.db_username,
             password: config.db_password,
             database: config.db_database,
-            entities: [User, Org, Team],
+            entities: [User, Org, Team, Player],
             synchronize: true,
         }),
+        UserModule,
+        PlayerModule,
+        AuthModule,
+        TeamModule,
+        OrgModule,
     ]
 })
 export class AppModule { }

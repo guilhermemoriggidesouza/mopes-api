@@ -24,10 +24,10 @@ export class User {
     
     @ManyToOne(() => Org, (user) => user.users)
     org: Org
+    
+    @Column({nullable: true})
+    orgId: number;
 
     @OneToMany(() => Team, team => team.creator)
     teamsCreated: Team[];
-
-    @Column({nullable: true})
-    orgId: number;
 }

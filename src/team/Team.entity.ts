@@ -1,3 +1,4 @@
+import { Player } from 'src/player/Player.entity';
 import { User } from 'src/user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
@@ -27,4 +28,7 @@ export class Team {
 
     @Column({default: false})
     payedIntegration: boolean;
+
+    @OneToMany(() => Player, player => player.team)
+    players: Player[];
 }
