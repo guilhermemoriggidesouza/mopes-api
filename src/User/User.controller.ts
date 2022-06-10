@@ -8,7 +8,7 @@ import { UserService } from './user.service';
 const urlBase: string = "/user"
 
 @Controller()
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
     constructor(private readonly userService: UserService) { }
     
@@ -25,7 +25,7 @@ export class UserController {
     }
     
     @Post(`${urlBase}`)
-    // @Roles(Role.Admin)
+    @Roles(Role.Admin)
     async createUser(@Body() payload: User): Promise<User> {
         return await this.userService.create(payload);
     }

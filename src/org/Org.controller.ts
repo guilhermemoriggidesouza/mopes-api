@@ -8,7 +8,7 @@ import { OrgService } from './Org.service';
 const urlBase: string = "/org"
 
 @Controller()
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class OrgController {
     constructor(private readonly orgService: OrgService) { }
     
@@ -25,7 +25,7 @@ export class OrgController {
     }
     
     @Post(`${urlBase}`)
-    // @Roles(Role.Admin)
+    @Roles(Role.Admin)
     async createOrg(@Body() payload: Org, @Request() req: any): Promise<Org> {
         return await this.orgService.create(payload, req.user?.id);
     }

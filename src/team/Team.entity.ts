@@ -9,25 +9,28 @@ export class Team {
 
     @Column()
     name: string;
-    
-    @ManyToOne(()=> User)
+
+    @ManyToOne(() => User)
     creator: User;
-    
+
     @Column()
     creatorId: number;
-    
-    @OneToOne(()=> User)
+
+    @OneToOne(() => User)
     @JoinColumn()
     coach: User;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     coachId: number;
 
     @Column()
     numberPlayers: number;
 
-    @Column({default: false})
+    @Column({ default: false })
     payedIntegration: boolean;
+
+    @Column({ nullable: true })
+    key: string;
 
     @OneToMany(() => Player, player => player.team)
     players: Player[];
