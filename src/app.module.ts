@@ -22,6 +22,12 @@ import { PlayerModule } from './player/Player.module';
             database: config.db_database,
             entities: [User, Org, Team, Player],
             synchronize: true,
+            ssl: true,
+            extra: {
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            }
         }),
         UserModule,
         PlayerModule,
