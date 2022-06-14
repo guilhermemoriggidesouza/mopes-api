@@ -1,23 +1,33 @@
+import { Player } from './player/Player.entity';
+import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './User/User.entity';
-import { UserModule } from './User/User.module';
-import { config as configDotenv } from 'dotenv'
-configDotenv()
+import { User } from './user/user.entity';
+import { UserModule } from './user/user.module';
+import config from './config';
+import { Org } from './org/Org.entity';
+import { OrgModule } from './org/Org.module';
+import { TeamModule } from './team/Team.module';
+import { Team } from './team/Team.entity';
+import { PlayerModule } from './player/Player.module';
 
 @Module({
     imports: [
-        UserModule,
         TypeOrmModule.forRoot({
             type: 'postgres',
-            host: process.env.HOST_DB_MOPE,
-            port: parseInt(process.env.PORT_DB_MOPE),
-            username: process.env.USER_DB_MOPE,
-            password: process.env.PASSWORD_DB_MOPE,
-            database: process.env.DATABASE_DB_MOPE,
-            entities: [User],
+            host: config.db_host,
+            port: parseInt(config.db_port),
+            username: config.db_username,
+            password: config.db_password,
+            database: config.db_database,
+            entities: [User, Org, Team, Player],
             synchronize: true,
         }),
-    ],
+        UserModule,
+        PlayerModule,
+        AuthModule,
+        TeamModule,
+        OrgModule,
+    ]
 })
 export class AppModule { }
