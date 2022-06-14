@@ -1,5 +1,5 @@
 import { Team } from 'src/team/Team.entity';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/User.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne, RelationId } from 'typeorm';
 
 @Entity()

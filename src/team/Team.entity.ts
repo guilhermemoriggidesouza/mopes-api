@@ -1,5 +1,5 @@
 import { Player } from 'src/player/Player.entity';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/User.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
