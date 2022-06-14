@@ -8,7 +8,7 @@ import { ChampionshipService } from './Championship.service';
 const urlBase: string = "/championship"
 
 @Controller()
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class ChampionshipController {
     constructor(private readonly championshipService: ChampionshipService) { }
     
@@ -25,7 +25,7 @@ export class ChampionshipController {
     }
     
     @Post(`${urlBase}`)
-    // @Roles(Role.Admin)
+    @Roles(Role.Admin)
     async createChampionship(@Body() payload: Championship, @Request() req: any): Promise<Championship> {
         return await this.championshipService.create(payload, req.user?.id);
     }
