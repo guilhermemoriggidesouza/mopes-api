@@ -1,3 +1,4 @@
+import { GameControl } from './../sumula/entities/GameControl.entity';
 import { Player } from 'src/player/Player.entity';
 import { User } from 'src/user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
@@ -23,6 +24,13 @@ export class Team {
     @Column({ nullable: true })
     coachId: number;
 
+    @OneToOne(() => Player)
+    @JoinColumn()
+    capitan: User;
+
+    @Column({ nullable: true })
+    capitanId: number;
+
     @Column()
     numberPlayers: number;
 
@@ -34,4 +42,8 @@ export class Team {
 
     @OneToMany(() => Player, player => player.team)
     players: Player[];
+
+    
+    @OneToMany(() => GameControl, GC => GC.team)
+    gameControls: GameControl[];
 }

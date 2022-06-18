@@ -1,6 +1,7 @@
+import { GameControl } from 'src/sumula/entities/GameControl.entity';
 import { Team } from 'src/team/Team.entity';
-import { User } from 'src/user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne, RelationId } from 'typeorm';
+import { User } from 'src/user/User.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne, RelationId, OneToMany } from 'typeorm';
 
 @Entity()
 export class Player {
@@ -10,7 +11,7 @@ export class Player {
     @Column()
     fantasyName: string;
 
-    @Column()
+    @Column({nullable: true})
     infractions: number;
 
     @OneToOne(() => User)
@@ -20,11 +21,14 @@ export class Player {
     @Column({ nullable: true })
     userId: number;
 
+    @ManyToOne(() => Team, (team) => team.players)
+    team: Team
+    
     @RelationId((player: Player) => player.team)
     @Column()
     teamId: number;
 
-    @ManyToOne(() => Team, (team) => team.players)
-    team: Team
+    @OneToMany(() => GameControl, GC => GC.player)
+    gameControls: GameControl[];
 }
 
