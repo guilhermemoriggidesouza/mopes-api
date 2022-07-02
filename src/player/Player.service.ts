@@ -47,8 +47,7 @@ export class PlayerService {
     }
 
     async addingFault(id: number, fault: number): Promise<object> {
-        const player = await this.playerRepository.findOne(id)
-        return await this.playerRepository.update(id, { infractions: player.infractions + fault });
+        return await this.playerRepository.update(id, { infractions: fault });
     }
 
 }

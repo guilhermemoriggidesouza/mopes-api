@@ -1,5 +1,5 @@
 import { Championship } from './../championship/Championship.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class CategoryGame {
@@ -14,12 +14,18 @@ export class CategoryGame {
     
     @Column()
     maxPeriod: number;
+
+    @Column()
+    maxPlayersPerGame: number;
     
     @Column()
     maxFaultsPerPlayer: number;
 
     @Column({default: false})
     pointsPerTeam: boolean;
+
+    @Column({default: true})
+    stayFaults: boolean;
 
     @OneToMany(() => Championship, champ => champ.category)
     championships: Championship[];

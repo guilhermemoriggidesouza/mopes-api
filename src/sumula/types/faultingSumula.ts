@@ -1,7 +1,8 @@
 type faultingSumula = {
     teamId: number,
     playerId?: number,
-    falt: number,
+    data: {
+        fault: number,
+    }
     makePerpetue: boolean,
-    period: number
 }

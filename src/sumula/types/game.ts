@@ -1,41 +1,25 @@
-type team = {
-    id: number;
-    name: string;
-    creatorId: number;
-    coachId: number;
-    capitanId: number;
-    points: number;
-    faults: number;
+type periodInfos = {
+    faults: number
+    points: number
 }
-
-type gameControl = {
+type PlayerInMatch = {
     id: number;
     sumulaId: number;
     teamId: number;
     playerId: number;
     point: number;
     fault: number;
-    period: number
 }
 
-type championship = {
-    id: number;
+type team = {
     name: string;
-    logo: string;
-    payedIntegration: boolean;
-    categoryId: number;
+    points: number;
+    faults: number;
 }
-
-type period = {
-    totalFaults: number
-    totalPoints: number
-}
-
-type game = {
+type gameStatus = {
     id: number;
-    teams: team[];
-    championship: championship;
     championshipId: number;
-    gameControls: gameControl[];
-    periods: period[]
+    playerInMatchs: PlayerInMatch[];
+    teams: team[],
+    periods: periodInfos[]
 }

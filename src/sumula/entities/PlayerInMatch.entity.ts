@@ -1,16 +1,16 @@
 import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { Player } from 'src/player/Player.entity';
 import { Team } from 'src/team/Team.entity';
-import { Entity, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn, JoinTable, ManyToMany, ManyToOne, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
 
 @Entity()
-export class GameControl {
+export class PlayerInMatch {
     @PrimaryGeneratedColumn()
     id: number;
 
     @ManyToOne(() => Sumula)
     sumula: Sumula;
-    @Column({nullable: true})
+    @Column()
     sumulaId: number;
     
     @ManyToOne(() => Team)
@@ -20,7 +20,7 @@ export class GameControl {
     
     @ManyToOne(() => Player)
     player: Player;
-    @Column({nullable: true})
+    @Column()
     playerId: number;
 
     @Column({default: 0})
@@ -28,7 +28,4 @@ export class GameControl {
 
     @Column({default: 0})
     fault: number;
-
-    @Column({default: 1})
-    period: number
 }

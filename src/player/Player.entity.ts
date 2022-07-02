@@ -1,4 +1,4 @@
-import { GameControl } from 'src/sumula/entities/GameControl.entity';
+import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
 import { Team } from 'src/team/Team.entity';
 import { User } from 'src/user/User.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne, RelationId, OneToMany } from 'typeorm';
@@ -28,7 +28,7 @@ export class Player {
     @Column()
     teamId: number;
 
-    @OneToMany(() => GameControl, GC => GC.player)
-    gameControls: GameControl[];
+    @OneToMany(() => PlayerInMatch, GC => GC.player)
+    PlayerInMatchs: PlayerInMatch[];
 }
 

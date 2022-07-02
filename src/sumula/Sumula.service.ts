@@ -1,4 +1,5 @@
-import { GameControl } from 'src/sumula/entities/GameControl.entity';
+import { Team } from 'src/team/Team.entity';
+import { PlayerInMatch } from './entities/PlayerInMatch.entity';
 import { Dependencies, Injectable } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,7 +11,7 @@ export class SumulaService {
 
     constructor(
         private readonly sumulaRepository: Repository<Sumula>,
-        private readonly gameControl: Repository<GameControl>,
+        private readonly PlayerInMatch: Repository<PlayerInMatch>,
     ) { }
 
     async create(Sumula: Sumula, ownerId: number): Promise<Sumula> {
@@ -22,7 +23,27 @@ export class SumulaService {
     }
 
     async findOne({ id, where }: { id?: string, where?: object }): Promise<Sumula> {
-        return this.sumulaRepository.findOne(id, { where, relations: ['teams', 'championship', 'championship.category', 'gameControls'] });
+        return this.sumulaRepository.findOne(id, { where, relations: ['teams', 'championship', 'championship.category', 'PlayerInMatchs', "playersInGame"] });
+    }
+
+    buildStatusTeam(teams: Team[], playerInMatchs: PlayerInMatch[], pointsPerTeam: boolean): team[] {
+        return teams.map(teamItem => {
+            const playersOfTeam = playerInMatchs.filter(playerInMatch => playerInMatch.teamId == teamItem.id)
+            const points = pointsPerTeam ? playersOfTeam[0].point : playersOfTeam.map(player => player.point).reduce((currentValue, previousValue) => currentValue + previousValue)
+            return {
+                name: teamItem.name,
+                points: points,
+                faults: 0
+            }
+        })
+    }
+
+    async getGameStatus({ id }: { id: string }): Promise<gameStatus> {
+        const sumulaInfos = await this.sumulaRepository.findOne(id, { relations: ['teams', 'championship', 'championship.category', 'playerInMatchs', 'periods'] });
+        return {
+            ...sumulaInfos,
+            teams: this.buildStatusTeam(sumulaInfos.teams, sumulaInfos.playerInMatchs, sumulaInfos.championship.category.pointsPerTeam),
+        } as gameStatus
     }
 
     async remove(id: string): Promise<object> {
@@ -33,23 +54,29 @@ export class SumulaService {
         return await this.sumulaRepository.update(id, payload);
     }
 
-    async addingInteration(id: string, payload: pointingSumula | faultingSumula): Promise<object> {
-        return await this.gameControl.save({
+    async updatePlayerInMatch(id: string, payload: pointingSumula | faultingSumula): Promise<object> {
+        return await this.PlayerInMatch.update({ teamId: payload.teamId, playerId: payload.playerId }, {
+            ...payload.data
+        });
+    }
+
+    async removePlayerInMatch(PlayerInMatchId: string): Promise<object> {
+        return await this.PlayerInMatch.delete({
+            id: parseInt(PlayerInMatchId),
+        });
+    }
+
+    async findAllPlayerInMatch(id: string): Promise<PlayerInMatch[]> {
+        return await this.PlayerInMatch.find({
+            sumulaId: parseInt(id)
+        })
+    }
+
+    async addingPlayerInMatch(id: string, payload: object): Promise<object> {
+        return await this.PlayerInMatch.save({
             sumulaId: parseInt(id),
             ...payload
         });
-    }
-
-    async removeInteration(gameControlId: string): Promise<object> {
-        return await this.gameControl.delete({
-            id: parseInt(gameControlId),
-        });
-    }
-
-    async findAllInterations(id: string): Promise<GameControl[]> {
-        return await this.gameControl.find({
-            sumulaId: parseInt(id)
-        })
     }
 
 }
