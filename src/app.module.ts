@@ -30,6 +30,12 @@ import { ChampionshipModule } from './championship/Championship.module';
             database: config.db_database,
             entities: [User, Org, Team, Player, Sumula, Championship, CategoryGame, StatusGamePeriod, PlayerInMatch],
             synchronize: true,
+            ssl: true,
+            extra: {
+              ssl: {
+                  rejectUnauthorized: false
+              }
+          }
         }),
         UserModule,
         PlayerModule,
