@@ -1,4 +1,4 @@
-import { Period } from './Period.entity';
+import { StatusGamePeriod } from './StatusGamePeriod.entity';
 import { PlayerInMatch } from './PlayerInMatch.entity';
 import { Championship } from './../../championship/Championship.entity';
 import { Team } from 'src/team/Team.entity';
@@ -22,8 +22,8 @@ export class Sumula {
     @OneToMany(() => PlayerInMatch, GC => GC.sumula)
     playerInMatchs: PlayerInMatch[];
 
-    @OneToMany(() => Period, GC => GC.sumula)
-    periods: Period[];
+    @OneToMany(() => StatusGamePeriod, GC => GC.sumula)
+    statusGamePeriod: StatusGamePeriod[];
 
     @Column()
     actualPeriod: number;

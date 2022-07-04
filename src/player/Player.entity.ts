@@ -17,18 +17,16 @@ export class Player {
     @OneToOne(() => User)
     @JoinColumn()
     user: User;
-
     @Column({ nullable: true })
     userId: number;
 
     @ManyToOne(() => Team, (team) => team.players)
     team: Team
-    
     @RelationId((player: Player) => player.team)
     @Column()
     teamId: number;
 
-    @OneToMany(() => PlayerInMatch, GC => GC.player)
-    PlayerInMatchs: PlayerInMatch[];
+    @OneToMany(() => PlayerInMatch, PIM => PIM.player)
+    matchs: PlayerInMatch[];
 }
 

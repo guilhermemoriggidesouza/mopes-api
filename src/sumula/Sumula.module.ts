@@ -1,14 +1,17 @@
+import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
+import { SumulaGateway } from './Sumula.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { SumulaController } from './Sumula.controller';
 import { SumulaService } from './Sumula.service';
 import { Sumula } from './entities/Sumula.entity';
 import { PlayerModule } from 'src/player/Player.module';
+import { StatusGamePeriod } from './entities/StatusGamePeriod.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Sumula]), PlayerModule],
+    imports: [TypeOrmModule.forFeature([Sumula, PlayerInMatch, StatusGamePeriod]), PlayerModule],
     controllers: [SumulaController],
-    providers: [SumulaService],
+    providers: [SumulaService, SumulaGateway],
     exports: [SumulaService],
 })
 export class SumulaModule { }

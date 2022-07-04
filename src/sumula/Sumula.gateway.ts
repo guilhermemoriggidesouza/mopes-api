@@ -6,15 +6,14 @@ import {
     WebSocketServer,
     WsResponse,
 } from '@nestjs/websockets';
-import { from, Observable } from 'rxjs';
 import { Server } from 'socket.io';
 
 @WebSocketGateway()
-export class EventsGateway {
+export class SumulaGateway {
     constructor(
         private readonly sumulaService: SumulaService,
     ) { }
-    
+
     @WebSocketServer()
     server: Server;
 

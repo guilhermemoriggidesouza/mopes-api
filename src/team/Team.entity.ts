@@ -1,4 +1,3 @@
-import { PlayerInMatch } from '../sumula/entities/PlayerInMatch.entity';
 import { Player } from 'src/player/Player.entity';
 import { User } from 'src/user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
@@ -43,6 +42,4 @@ export class Team {
     @OneToMany(() => Player, player => player.team)
     players: Player[];
     
-    @OneToMany(() => PlayerInMatch, GC => GC.team)
-    PlayerInMatchs: PlayerInMatch[];
 }

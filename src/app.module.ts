@@ -1,3 +1,9 @@
+import { CategoryGameModule } from './categoryGame/CategoryGame.module';
+import { SumulaModule } from './sumula/Sumula.module';
+import { StatusGamePeriod } from './sumula/entities/StatusGamePeriod.entity';
+import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
+import { Championship } from './championship/Championship.entity';
+import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { Player } from './player/Player.entity';
 import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
@@ -10,6 +16,8 @@ import { OrgModule } from './org/Org.module';
 import { TeamModule } from './team/Team.module';
 import { Team } from './team/Team.entity';
 import { PlayerModule } from './player/Player.module';
+import { CategoryGame } from './categoryGame/CategoryGame.entity';
+import { ChampionshipModule } from './championship/Championship.module';
 
 @Module({
     imports: [
@@ -20,14 +28,18 @@ import { PlayerModule } from './player/Player.module';
             username: config.db_username,
             password: config.db_password,
             database: config.db_database,
-            entities: [User, Org, Team, Player],
+            entities: [User, Org, Team, Player, Sumula, Championship, CategoryGame, StatusGamePeriod, PlayerInMatch],
             synchronize: true,
+            logging: true,
         }),
         UserModule,
         PlayerModule,
         AuthModule,
         TeamModule,
         OrgModule,
+        SumulaModule,
+        ChampionshipModule,
+        CategoryGameModule
     ]
 })
 export class AppModule { }

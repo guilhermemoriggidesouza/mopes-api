@@ -5,4 +5,5 @@ type faultingSumula = {
         fault: number,
     }
     makePerpetue: boolean,
+    period: number
 }

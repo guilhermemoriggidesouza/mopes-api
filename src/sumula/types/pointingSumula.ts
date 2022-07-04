@@ -3,5 +3,6 @@ type pointingSumula = {
     playerId?: number,
     data: {
         point: number,
-    }
+    },
+    period: number
 }

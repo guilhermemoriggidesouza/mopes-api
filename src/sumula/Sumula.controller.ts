@@ -50,23 +50,23 @@ export class SumulaController {
     @Post(`${urlBase}/:id/pointing`)
     @Roles(Role.Admin)
     async poitingSumula(@Param("id") id: string, @Body() payload: pointingSumula): Promise<object> {
-        return await this.sumulaService.updatePlayerInMatch(id, payload);
+        return await this.sumulaService.updatePlayerPointInMatch(id, payload);
     }
 
     @Post(`${urlBase}/:id/faulting`)
     @Roles(Role.Admin)
     async faultingSumula(@Param("id") id: string, @Body() payload: faultingSumula): Promise<object> {
-        const interaction = await this.sumulaService.updatePlayerInMatch(id, payload);
+        const interaction = await this.sumulaService.updatePlayerFaultInMatch(id, payload);
         if (payload.makePerpetue && payload.playerId) {
             await this.playerService.addingFault(payload.playerId, payload.data.fault)
         }
         return interaction
     }
 
-    @Delete(`${urlBase}/:id/player-in-match`)
+    @Delete(`${urlBase}/player-in-match`)
     @Roles(Role.Admin)
-    async removeInteration(@Param("id") id: string): Promise<object> {
-        return await this.sumulaService.removePlayerInMatch(id);
+    async removeInteration(@Body() payload: any): Promise<object> {
+        return await this.sumulaService.removePlayerStatus(payload.statusIds);
     }
 
     @Get(`${urlBase}/:id/player-in-match`)
@@ -77,7 +77,7 @@ export class SumulaController {
 
     @Post(`${urlBase}/:id/player-in-match`)
     @Roles(Role.Admin)
-    async addPlayerInMatch(@Param("id") id: string, @Body() payload: pointingSumula): Promise<object> {
+    async addPlayerInMatch(@Param("id") id: string, @Body() payload: object): Promise<object> {
         return await this.sumulaService.addingPlayerInMatch(id, payload);
     }
 

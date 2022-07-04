@@ -1,7 +1,8 @@
+import { StatusGamePeriod } from './StatusGamePeriod.entity';
 import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { Player } from 'src/player/Player.entity';
 import { Team } from 'src/team/Team.entity';
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, OneToMany } from 'typeorm';
 
 @Entity()
 export class PlayerInMatch {
@@ -28,4 +29,7 @@ export class PlayerInMatch {
 
     @Column({default: 0})
     fault: number;
+
+    @OneToMany(() => StatusGamePeriod, SGP => SGP.playerInMatch)
+    statusGamePeriod: StatusGamePeriod[];
 }

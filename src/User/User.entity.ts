@@ -24,7 +24,6 @@ export class User {
     
     @ManyToOne(() => Org, (user) => user.users)
     org: Org
-    
     @Column({nullable: true})
     orgId: number;
 
