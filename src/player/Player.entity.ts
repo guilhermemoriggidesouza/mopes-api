@@ -10,19 +10,20 @@ export class Player {
     @Column()
     fantasyName: string;
 
-    @Column({nullable: true})
+    @Column()
     infractions: number;
 
     @OneToOne(() => User)
     @JoinColumn()
     user: User;
+
     @Column({ nullable: true })
     userId: number;
 
-    @ManyToOne(() => Team)
-    team: Team
     @RelationId((player: Player) => player.team)
     @Column()
     teamId: number;
-}
 
+    @ManyToOne(() => Team, (team) => team.players)
+    team: Team
+}

@@ -1,11 +1,11 @@
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/User.service';
 import { PlayerService } from './../player/Player.service';
 import { Player } from 'src/player/Player.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Team } from './Team.entity';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/User.entity';
 
 @Injectable()
 export class TeamService {
