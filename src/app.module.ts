@@ -1,3 +1,7 @@
+import { SumulaModule } from './sumula/Sumula.module';
+import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
+import { StatusGamePeriod } from './sumula/entities/StatusGamePeriod.entity';
+import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { CategoryGameModule } from './categoryGame/CategoryGame.module';
 import { Championship } from './championship/Championship.entity';
 import { Player } from './player/Player.entity';
@@ -24,20 +28,15 @@ import { ChampionshipModule } from './championship/Championship.module';
             username: config.db_username,
             password: config.db_password,
             database: config.db_database,
-            entities: [User, Org, Team, Player, Championship, CategoryGame],
+            entities: [User, Org, Team, Player, Sumula, Championship, CategoryGame, StatusGamePeriod, PlayerInMatch],
             synchronize: true,
-            ssl: true,
-            extra: {
-                ssl: {
-                    rejectUnauthorized: false
-                }
-            }
         }),
         UserModule,
         PlayerModule,
         AuthModule,
         TeamModule,
         OrgModule,
+        SumulaModule,
         ChampionshipModule,
         CategoryGameModule
     ]
