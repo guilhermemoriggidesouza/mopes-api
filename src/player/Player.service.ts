@@ -46,4 +46,8 @@ export class PlayerService {
         return await this.playerRepository.update(id, payload);
     }
 
+    async addingFault(id: number, fault: number): Promise<object> {
+        return await this.playerRepository.increment({id}, "infractions", fault);
+    }
+
 }

@@ -34,4 +34,5 @@ export class Team {
 
     @OneToMany(() => Player, player => player.team)
     players: Player[];
+    
 }

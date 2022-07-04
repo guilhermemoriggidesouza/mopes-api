@@ -1,5 +1,6 @@
+import { CategoryGame } from './../categoryGame/CategoryGame.entity';
 import { User } from 'src/user/User.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Championship {
@@ -24,4 +25,10 @@ export class Championship {
 
     @Column({default: false})
     payedIntegration: boolean;
+
+    @ManyToOne(() => CategoryGame)
+    category: CategoryGame;
+
+    @Column({nullable: true})
+    categoryId: number;
 }

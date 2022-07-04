@@ -1,3 +1,5 @@
+import { CategoryGameModule } from './categoryGame/CategoryGame.module';
+import { Championship } from './championship/Championship.entity';
 import { Player } from './player/Player.entity';
 import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
@@ -10,6 +12,8 @@ import { OrgModule } from './org/Org.module';
 import { TeamModule } from './team/Team.module';
 import { Team } from './team/Team.entity';
 import { PlayerModule } from './player/Player.module';
+import { CategoryGame } from './categoryGame/CategoryGame.entity';
+import { ChampionshipModule } from './championship/Championship.module';
 
 @Module({
     imports: [
@@ -20,7 +24,7 @@ import { PlayerModule } from './player/Player.module';
             username: config.db_username,
             password: config.db_password,
             database: config.db_database,
-            entities: [User, Org, Team, Player],
+            entities: [User, Org, Team, Player, Championship, CategoryGame],
             synchronize: true,
             ssl: true,
             extra: {
@@ -34,6 +38,8 @@ import { PlayerModule } from './player/Player.module';
         AuthModule,
         TeamModule,
         OrgModule,
+        ChampionshipModule,
+        CategoryGameModule
     ]
 })
 export class AppModule { }

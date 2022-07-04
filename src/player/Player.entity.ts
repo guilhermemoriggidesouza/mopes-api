@@ -27,4 +27,3 @@ export class Player {
     @ManyToOne(() => Team, (team) => team.players)
     team: Team
 }
-
