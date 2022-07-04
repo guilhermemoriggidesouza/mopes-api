@@ -1,6 +1,6 @@
 import { BadRequestException, Dependencies, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/User.service';
 import { Repository } from 'typeorm';
 import { Player } from './Player.entity';
 

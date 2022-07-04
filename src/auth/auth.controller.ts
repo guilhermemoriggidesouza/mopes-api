@@ -1,6 +1,6 @@
 import { AuthService } from './auth.service';
 import { Body, Controller, Delete, Get, Param, Post, Request, UseGuards } from '@nestjs/common';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/User.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 const urlBase: string = "/auth"
 

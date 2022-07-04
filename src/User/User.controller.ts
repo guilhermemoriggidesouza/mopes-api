@@ -3,8 +3,8 @@ import { Roles } from '../role.decorators';
 import { Role } from './../role.enum';
 import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from './user.entity';
-import { UserService } from './user.service';
+import { User } from './User.entity';
+import { UserService } from './User.service';
 const urlBase: string = "/user"
 
 @Controller()

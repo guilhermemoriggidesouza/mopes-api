@@ -1,4 +1,3 @@
-import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { CategoryGame } from './../categoryGame/CategoryGame.entity';
 import { User } from 'src/user/User.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
@@ -32,7 +31,4 @@ export class Championship {
 
     @Column({nullable: true})
     categoryId: number;
-
-    @OneToMany(() => Sumula, sumula => sumula.championship)
-    sumulas: Sumula[];
 }
