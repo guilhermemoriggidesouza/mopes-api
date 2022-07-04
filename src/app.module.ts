@@ -27,6 +27,12 @@ import { ChampionshipModule } from './championship/Championship.module';
             entities: [User, Org, Team, Player, Championship, CategoryGame],
             synchronize: true,
             logging: true,
+            ssl: true,
+            extra: {
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            }
         }),
         UserModule,
         PlayerModule,
