@@ -26,7 +26,6 @@ import { ChampionshipModule } from './championship/Championship.module';
             database: config.db_database,
             entities: [User, Org, Team, Player, Championship, CategoryGame],
             synchronize: true,
-            logging: true,
             ssl: true,
             extra: {
                 ssl: {
