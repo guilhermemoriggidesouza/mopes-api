@@ -1,9 +1,5 @@
 import { CategoryGameModule } from './categoryGame/CategoryGame.module';
-import { SumulaModule } from './sumula/Sumula.module';
-import { StatusGamePeriod } from './sumula/entities/StatusGamePeriod.entity';
-import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
 import { Championship } from './championship/Championship.entity';
-import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { Player } from './player/Player.entity';
 import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
@@ -28,7 +24,7 @@ import { ChampionshipModule } from './championship/Championship.module';
             username: config.db_username,
             password: config.db_password,
             database: config.db_database,
-            entities: [User, Org, Team, Player, Sumula, Championship, CategoryGame, StatusGamePeriod, PlayerInMatch],
+            entities: [User, Org, Team, Player, Championship, CategoryGame],
             synchronize: true,
             logging: true,
         }),
@@ -37,7 +33,6 @@ import { ChampionshipModule } from './championship/Championship.module';
         AuthModule,
         TeamModule,
         OrgModule,
-        SumulaModule,
         ChampionshipModule,
         CategoryGameModule
     ]

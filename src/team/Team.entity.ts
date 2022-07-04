@@ -25,7 +25,7 @@ export class Team {
 
     @OneToOne(() => Player)
     @JoinColumn()
-    capitan: User;
+    capitan: Player;
 
     @Column({ nullable: true })
     capitanId: number;
