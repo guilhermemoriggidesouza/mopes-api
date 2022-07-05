@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from '../user/User.service';
 import { JwtService } from '@nestjs/jwt';
 
@@ -17,6 +17,6 @@ export class AuthService {
                 access_token: this.jwtService.sign(result),
             };
         }
-        return null;
+        throw new BadRequestException("Error on login")
     }
 }
