@@ -1,3 +1,4 @@
+import { Team } from 'src/team/Team.entity';
 import { User } from 'src/user/User.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
 
@@ -21,6 +22,9 @@ export class Org {
 
     @OneToMany(() => User, user => user.org)
     users: User[];
+
+    @OneToMany(() => Team, team => team.org)
+    teams: Team[];
 
     @Column({default: false})
     payedIntegration: boolean;

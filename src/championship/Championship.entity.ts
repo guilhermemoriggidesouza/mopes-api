@@ -1,3 +1,4 @@
+import { Team } from 'src/team/Team.entity';
 import { CategoryGame } from './../categoryGame/CategoryGame.entity';
 import { User } from 'src/user/User.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
@@ -20,8 +21,8 @@ export class Championship {
     @Column({nullable: true})
     ownerId: number;
 
-    @OneToMany(() => User, user => user.org)
-    users: User[];
+    @OneToMany(() => Team, team => team.championship)
+    teams: Team[];
 
     @Column({default: false})
     payedIntegration: boolean;
