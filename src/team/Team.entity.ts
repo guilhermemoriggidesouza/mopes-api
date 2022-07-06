@@ -25,7 +25,7 @@ export class Team {
 
   @Column()
   creatorId: number;
-
+ 
   @ManyToOne(() => Org)
   org: Org;
 
