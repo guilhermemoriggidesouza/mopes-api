@@ -1,3 +1,4 @@
+import { Player } from 'src/player/Player.entity';
 import { Team } from './../team/Team.entity';
 import { Org } from './../org/Org.entity';
 import {
@@ -6,6 +7,8 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -35,4 +38,12 @@ export class User {
 
   @OneToMany(() => Team, (team) => team.creator)
   teamsCreated?: Team[];
+
+  @OneToOne(() => Player, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  player?: Player;
+
+  @OneToOne(() => Team, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  team?: Team;
 }
