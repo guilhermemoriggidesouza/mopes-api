@@ -26,7 +26,7 @@ export class PlayerService {
     await this.playerRepository.delete({
       id: In(players.map((player) => player.id).map((e) => e)),
     });
-    console.log("deleted player")
+    console.log('deleted player', players);
     const playersInsert = players.map(async (player) => {
       const user = await this.userService.create(player.user);
       if (!user) {
@@ -34,9 +34,10 @@ export class PlayerService {
       }
       player.userId = user.id;
       delete player.user;
+      console.log(player);
       return this.create(player);
     });
-    console.log("player saved")
+    console.log('player saved');
     return await Promise.all(playersInsert);
   }
 
