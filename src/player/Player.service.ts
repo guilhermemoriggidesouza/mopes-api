@@ -36,7 +36,7 @@ export class PlayerService {
         login: player.login,
         password: player.password,
         orgId,
-        teamId,
+        playerId: playerInserted.id,
       });
       return this.playerRepository.update(playerInserted.id.toString(), {
         userId: user.id,
