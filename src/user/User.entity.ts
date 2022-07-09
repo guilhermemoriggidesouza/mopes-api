@@ -39,12 +39,12 @@ export class User {
   @OneToMany(() => Team, (team) => team.creator)
   teamsCreated?: Team[];
 
-  @OneToOne(() => Team, (team) => team.coach, { onDelete: 'CASCADE' })
+  @OneToOne(() => Team, (team) => team.coach)
   team?: Team;
   @Column({ nullable: true })
   teamId?: number;
 
-  @OneToOne(() => Player, (player) => player.user, { onDelete: 'CASCADE' })
+  @OneToOne(() => Player, (player) => player.user)
   player?: Player;
   @Column({ nullable: true })
   playerId?: number;

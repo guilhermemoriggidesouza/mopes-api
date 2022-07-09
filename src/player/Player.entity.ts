@@ -32,6 +32,6 @@ export class Player {
   @Column()
   teamId?: number;
 
-  @ManyToOne(() => Team, (team) => team.players, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Team, (team) => team.players)
   team?: Team;
 }

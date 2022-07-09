@@ -36,8 +36,6 @@ export class PlayerInMatch {
   @Column({ default: 0 })
   fault: number;
 
-  @OneToMany(() => StatusGamePeriod, (SGP) => SGP.playerInMatch, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => StatusGamePeriod, (SGP) => SGP.playerInMatch)
   statusGamePeriod: StatusGamePeriod[];
 }

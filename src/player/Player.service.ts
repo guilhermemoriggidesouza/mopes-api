@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
 import { UserService } from 'src/user/User.service';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Not, Repository } from 'typeorm';
 import { Player } from './Player.entity';
 
 @Injectable()
@@ -26,6 +26,9 @@ export class PlayerService {
     await this.playerRepository.delete({
       teamId,
     });
+    await this.userService.remove({
+      where: { teamId, playerId: Not(IsNull()) },
+    });
     const playersInsert = players.map(async (player) => {
       const playerInserted = await this.create({
         name: player.name,
@@ -37,6 +40,7 @@ export class PlayerService {
         password: player.password,
         orgId,
         playerId: playerInserted.id,
+        teamId: player.teamId,
       });
       return this.playerRepository.update(playerInserted.id.toString(), {
         userId: user.id,
