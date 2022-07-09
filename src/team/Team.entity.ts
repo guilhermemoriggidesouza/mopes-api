@@ -38,7 +38,7 @@ export class Team {
   @Column({ nullable: true })
   championshipId: number;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.team)
   @JoinColumn()
   coach: User;
 
