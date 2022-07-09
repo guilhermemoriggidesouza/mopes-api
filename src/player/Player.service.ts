@@ -22,22 +22,26 @@ export class PlayerService {
     return this.playerRepository.save(player);
   }
 
-  async createMany(players: Player[]) {
+  async createMany(players: any[], orgId: number) {
     await this.playerRepository.delete({
       id: In(players.map((player) => player.id).map((e) => e)),
     });
-    console.log('deleted player', players);
     const playersInsert = players.map(async (player) => {
-      const user = await this.userService.create(player.user);
+      const user = await this.userService.create({
+        name: player.name,
+        login: player.login,
+        password: player.password,
+        orgId,
+      });
       if (!user) {
         throw new BadRequestException('Error user by player cannot be created');
       }
-      player.userId = user.id;
-      delete player.user;
-      console.log(player);
-      return this.create(player);
+      return this.create({
+        name: player.name,
+        userId: user.id,
+        teamId: player.teamId,
+      });
     });
-    console.log('player saved');
     return await Promise.all(playersInsert);
   }
 

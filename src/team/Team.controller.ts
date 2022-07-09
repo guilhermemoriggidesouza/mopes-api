@@ -46,8 +46,9 @@ export class TeamController {
   async editTeams(
     @Param('id') id: string,
     @Body() payload: Team,
+    @Request() req: any,
   ): Promise<object> {
-    return await this.teamService.edit(id, payload as object);
+    return await this.teamService.edit(id, payload as object, req.user.orgId);
   }
 
   @Delete(`${urlBase}/:id`)

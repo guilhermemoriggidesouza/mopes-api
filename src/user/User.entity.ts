@@ -11,13 +11,13 @@ import {
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column()
   name: string;
 
   @Column({ type: 'date', nullable: true })
-  birthday: string;
+  birthday?: string;
 
   @Column()
   login: string;
@@ -26,13 +26,13 @@ export class User {
   password: string;
 
   @Column({ default: 'player', nullable: true })
-  role: string;
+  role?: string;
 
   @ManyToOne(() => Org, (user) => user.users, { onDelete: 'CASCADE' })
-  org: Org;
+  org?: Org;
   @Column({ nullable: true })
   orgId: number;
 
   @OneToMany(() => Team, (team) => team.creator, { onDelete: 'CASCADE' })
-  teamsCreated: Team[];
+  teamsCreated?: Team[];
 }
