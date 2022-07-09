@@ -8,6 +8,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   Request,
   UseGuards,
@@ -40,7 +41,7 @@ export class TeamController {
     return await this.teamService.create(payload, req.user.id, req.user.orgId);
   }
 
-  @Post(`${urlBase}/:id`)
+  @Put(`${urlBase}/:id`)
   @Roles(Role.Coach, Role.Admin)
   async editTeams(
     @Param('id') id: string,

@@ -1,7 +1,7 @@
 import { RolesGuard } from 'src/role.guard';
 import { Roles } from '../role.decorators';
 import { Role } from '../role.enum';
-import { Body, Controller, Delete, Get, Param, Post, Req, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Player } from './Player.entity';
 import { PlayerService } from './Player.service';
@@ -24,7 +24,7 @@ export class PlayerController {
         return await this.playerService.findOne({ id });
     }
     
-    @Post(`${urlBase}/:id`)
+    @Put(`${urlBase}/:id`)
     @Roles(Role.Player, Role.Coach)
     async editPlayers(@Param("id") id: string, @Body() payload: Player): Promise<object> {
         return await this.playerService.edit(id, (payload as object));

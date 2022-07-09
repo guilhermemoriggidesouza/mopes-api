@@ -44,6 +44,7 @@ export class TeamService {
   }
 
   async saveCoach(user: User): Promise<number> {
+    await this.userService.remove(user.id.toString());
     const userCreated = await this.userService.create(user);
     return userCreated.id;
   }
