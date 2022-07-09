@@ -32,6 +32,8 @@ export class TeamService {
   }
 
   async remove(id: string): Promise<object> {
+    await this.playerService.remove({ where: { teamId: id } });
+    await this.userService.remove({ where: { teamId: id } });
     return await this.teamRepository.delete(id);
   }
 
@@ -52,7 +54,7 @@ export class TeamService {
   async saveCoach(user: User, id: number): Promise<number> {
     if (user.id) {
       await this.teamRepository.update(id, { coachId: null });
-      await this.userService.remove(user.id.toString());
+      await this.userService.remove({ id: user.id.toString() });
     }
     const userCreated = await this.userService.create(user);
     return userCreated.id;

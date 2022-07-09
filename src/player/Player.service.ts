@@ -62,8 +62,8 @@ export class PlayerService {
     });
   }
 
-  async remove(id: string): Promise<object> {
-    return await this.playerRepository.delete(id);
+  async remove({ id, where }: { id?: string; where?: any }): Promise<object> {
+    return await this.playerRepository.delete(id || where);
   }
 
   async edit(id: string, payload: object): Promise<object> {

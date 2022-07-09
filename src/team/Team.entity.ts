@@ -38,7 +38,7 @@ export class Team {
   @Column({ nullable: true })
   championshipId: number;
 
-  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @OneToOne(() => User)
   @JoinColumn()
   coach: User;
 
@@ -51,6 +51,6 @@ export class Team {
   @Column({ nullable: true })
   key: string;
 
-  @OneToMany(() => Player, (player) => player.team, { onDelete: 'CASCADE' })
+  @OneToMany(() => Player, (player) => player.team)
   players: Player[];
 }
