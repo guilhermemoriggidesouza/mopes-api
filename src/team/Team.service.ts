@@ -32,8 +32,11 @@ export class TeamService {
   }
 
   async remove(id: string): Promise<object> {
+    const team = await this.teamRepository.findOne(id, {
+      relations: ['coach'],
+    });
     await this.playerService.remove({ where: { teamId: id } });
-    await this.userService.remove({ where: { teamId: id } });
+    await this.userService.remove({ id: team.coachId.toString() });
     return await this.teamRepository.delete(id);
   }
 
