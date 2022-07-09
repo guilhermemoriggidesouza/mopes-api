@@ -37,10 +37,13 @@ export class PlayerService {
       if (!user) {
         throw new BadRequestException('Error user by player cannot be created');
       }
-      return this.create({
+      const playerInserted = await this.create({
         name: player.name,
         userId: user.id,
         teamId: player.teamId,
+      });
+      await this.userService.edit(user.id.toString(), {
+        playerId: playerInserted.id,
       });
     });
     return await Promise.all(playersInsert);
