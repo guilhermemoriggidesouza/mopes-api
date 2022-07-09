@@ -27,7 +27,7 @@ export class TeamService {
   async findOne({ id, where }: { id?: string; where?: object }): Promise<Team> {
     return this.teamRepository.findOne(id, {
       where,
-      relations: ['players', "players.user", 'coach'],
+      relations: ['players', 'players.user', 'coach'],
     });
   }
 
@@ -42,15 +42,16 @@ export class TeamService {
       orgId,
     });
     console.log('saved players');
-    payload.coachId = await this.saveCoach(payload.coach);
+    payload.coachId = await this.saveCoach(payload.coach, parseInt(id));
     console.log('saved coach');
     delete payload.players;
     delete payload.coach;
     return await this.teamRepository.update(id, payload);
   }
 
-  async saveCoach(user: User): Promise<number> {
+  async saveCoach(user: User, id: number): Promise<number> {
     if (user.id) {
+      await this.teamRepository.update(id, { coachId: null });
       await this.userService.remove(user.id.toString());
     }
     const userCreated = await this.userService.create(user);
