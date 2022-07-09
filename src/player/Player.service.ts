@@ -22,9 +22,9 @@ export class PlayerService {
     return this.playerRepository.save(player);
   }
 
-  async createMany(players: any[], orgId: number) {
+  async createMany(players: any[], orgId: number, teamId: number) {
     await this.playerRepository.delete({
-      teamId: players[0].teamId,
+      teamId,
     });
     const playersInsert = players.map(async (player) => {
       const user = await this.userService.create({

@@ -72,7 +72,7 @@ export class TeamService {
         ...player,
         teamId,
       }));
-      await this.playerService.createMany(players, orgId);
+      await this.playerService.createMany(players, orgId, teamId);
     }
   }
 }
