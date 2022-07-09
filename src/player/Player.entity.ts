@@ -21,7 +21,7 @@ export class Player {
   @Column({ nullable: true, default: 0 })
   infractions?: number;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user?: User;
 
