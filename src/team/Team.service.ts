@@ -36,17 +36,23 @@ export class TeamService {
   }
 
   async edit(id: string, payload: any, orgId: number): Promise<object> {
-    await this.savePlayers({ players: payload.players, teamId: parseInt(id), orgId });
-    console.log("saved players")
+    await this.savePlayers({
+      players: payload.players,
+      teamId: parseInt(id),
+      orgId,
+    });
+    console.log('saved players');
     payload.coachId = await this.saveCoach(payload.coach);
-    console.log("saved coach")
+    console.log('saved coach');
     delete payload.players;
     delete payload.coach;
     return await this.teamRepository.update(id, payload);
   }
 
   async saveCoach(user: User): Promise<number> {
-    await this.userService.remove(user.id.toString());
+    if (user.id) {
+      await this.userService.remove(user.id.toString());
+    }
     const userCreated = await this.userService.create(user);
     return userCreated.id;
   }
@@ -54,11 +60,11 @@ export class TeamService {
   async savePlayers({
     players,
     teamId,
-    orgId
+    orgId,
   }: {
     players: Player[];
     teamId: number;
-    orgId: number
+    orgId: number;
   }) {
     if (players && teamId) {
       players = players.map((player) => ({
