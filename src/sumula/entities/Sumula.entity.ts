@@ -9,20 +9,20 @@ export class Sumula {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToMany(() => Team, { onDelete: 'CASCADE' })
+    @ManyToMany(() => Team)
     @JoinTable()
     teams: Team[];
 
-    @ManyToOne(() => Championship, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Championship)
     championship: Championship;
 
     @Column({ nullable: true })
     championshipId: number;
 
-    @OneToMany(() => PlayerInMatch, GC => GC.sumula, { onDelete: 'CASCADE' })
+    @OneToMany(() => PlayerInMatch, GC => GC.sumula)
     playerInMatchs: PlayerInMatch[];
 
-    @OneToMany(() => StatusGamePeriod, GC => GC.sumula, { onDelete: 'CASCADE' })
+    @OneToMany(() => StatusGamePeriod, GC => GC.sumula)
     statusGamePeriod: StatusGamePeriod[];
 
     @Column()

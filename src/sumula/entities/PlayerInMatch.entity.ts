@@ -15,17 +15,17 @@ export class PlayerInMatch {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Sumula, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Sumula)
   sumula: Sumula;
   @Column()
   sumulaId: number;
 
-  @ManyToOne(() => Team, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Team)
   team: Team;
   @Column()
   teamId: number;
 
-  @ManyToOne(() => Player, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Player)
   player: Player;
   @Column()
   playerId: number;

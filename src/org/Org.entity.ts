@@ -13,17 +13,17 @@ export class Org {
     @Column({nullable: true})
     logo: string;
     
-    @OneToOne(()=> User, { onDelete: 'CASCADE'})
+    @OneToOne(()=> User)
     @JoinColumn()
     owner: User;
 
     @Column({nullable: true})
     ownerId: number;
 
-    @OneToMany(() => User, user => user.org, { onDelete: 'CASCADE'})
+    @OneToMany(() => User, user => user.org)
     users: User[];
 
-    @OneToMany(() => Team, team => team.org, { onDelete: 'CASCADE'})
+    @OneToMany(() => Team, team => team.org)
     teams: Team[];
 
     @Column({default: false})
