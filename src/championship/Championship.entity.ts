@@ -14,20 +14,20 @@ export class Championship {
     @Column({nullable: true})
     logo: string;
     
-    @OneToOne(()=> User)
+    @OneToOne(()=> User, { onDelete: 'CASCADE'})
     @JoinColumn()
     owner: User;
 
     @Column({nullable: true})
     ownerId: number;
 
-    @OneToMany(() => Team, team => team.championship)
+    @OneToMany(() => Team, team => team.championship, { onDelete: 'CASCADE'})
     teams: Team[];
 
     @Column({default: false})
     payedIntegration: boolean;
 
-    @ManyToOne(() => CategoryGame)
+    @ManyToOne(() => CategoryGame, { onDelete: 'CASCADE'})
     category: CategoryGame;
 
     @Column({nullable: true})

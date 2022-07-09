@@ -13,7 +13,7 @@ export class Player {
     @Column()
     infractions: number;
 
-    @OneToOne(() => User)
+    @OneToOne(() => User, { onDelete: 'CASCADE'})
     @JoinColumn()
     user: User;
 
@@ -24,6 +24,6 @@ export class Player {
     @Column()
     teamId: number;
 
-    @ManyToOne(() => Team, (team) => team.players)
+    @ManyToOne(() => Team, (team) => team.players, { onDelete: 'CASCADE'})
     team: Team
 }

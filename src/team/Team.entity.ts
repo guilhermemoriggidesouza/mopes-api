@@ -20,25 +20,25 @@ export class Team {
   @Column({ nullable: true })
   name: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE'})
   creator: User;
 
   @Column()
   creatorId: number;
  
-  @ManyToOne(() => Org)
+  @ManyToOne(() => Org, { onDelete: 'CASCADE'})
   org: Org;
 
   @Column()
   orgId: number;
 
-  @ManyToOne(() => Championship)
+  @ManyToOne(() => Championship, { onDelete: 'CASCADE'})
   championship: Championship;
 
   @Column({ nullable: true })
   championshipId: number;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE'})
   @JoinColumn()
   coach: User;
 
@@ -54,6 +54,6 @@ export class Team {
   @Column({ nullable: true })
   key: string;
 
-  @OneToMany(() => Player, (player) => player.team)
+  @OneToMany(() => Player, (player) => player.team, { onDelete: 'CASCADE'})
   players: Player[];
 }

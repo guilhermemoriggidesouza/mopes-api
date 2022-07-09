@@ -8,17 +8,17 @@ export class StatusGamePeriod {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => PlayerInMatch)
+    @ManyToOne(() => PlayerInMatch, { onDelete: 'CASCADE' })
     playerInMatch: PlayerInMatch;
     @Column()
     playerInMatchId: number;
 
-    @ManyToOne(() => Sumula)
+    @ManyToOne(() => Sumula, { onDelete: 'CASCADE' })
     sumula: Sumula;
     @Column()
     sumulaId: number;
 
-    @ManyToOne(() => Team)
+    @ManyToOne(() => Team, { onDelete: 'CASCADE' })
     team: Team;
     @Column()
     teamId: number;

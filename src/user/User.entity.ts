@@ -22,11 +22,11 @@ export class User {
     @Column({ default: 'player', nullable: true })
     role: string;
     
-    @ManyToOne(() => Org, (user) => user.users)
+    @ManyToOne(() => Org, (user) => user.users, { onDelete: 'CASCADE'})
     org: Org
     @Column({nullable: true})
     orgId: number;
 
-    @OneToMany(() => Team, team => team.creator)
+    @OneToMany(() => Team, team => team.creator, { onDelete: 'CASCADE'})
     teamsCreated: Team[];
 }
