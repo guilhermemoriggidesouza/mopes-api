@@ -27,6 +27,10 @@ export class PlayerService {
       teamId,
     });
     const playersInsert = players.map(async (player) => {
+      const playerInserted = await this.create({
+        name: player.name,
+        teamId: player.teamId,
+      });
       const user = await this.userService.create({
         name: player.name,
         login: player.login,
@@ -34,16 +38,8 @@ export class PlayerService {
         orgId,
         teamId,
       });
-      if (!user) {
-        throw new BadRequestException('Error user by player cannot be created');
-      }
-      const playerInserted = await this.create({
-        name: player.name,
+      return this.playerRepository.update(playerInserted.id.toString(), {
         userId: user.id,
-        teamId: player.teamId,
-      });
-      await this.userService.edit(user.id.toString(), {
-        playerId: playerInserted.id,
       });
     });
     return await Promise.all(playersInsert);

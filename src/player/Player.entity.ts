@@ -26,11 +26,11 @@ export class Player {
   user?: User;
 
   @Column({ nullable: true })
-  userId: number;
+  userId?: number;
 
   @RelationId((player: Player) => player.team)
   @Column()
-  teamId: number;
+  teamId?: number;
 
   @ManyToOne(() => Team, (team) => team.players, { onDelete: 'CASCADE' })
   team?: Team;
