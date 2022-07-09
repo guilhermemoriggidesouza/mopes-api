@@ -34,16 +34,18 @@ export class User {
   @ManyToOne(() => Org, (user) => user.users)
   org?: Org;
   @Column({ nullable: true })
-  orgId: number;
+  orgId?: number;
 
   @OneToMany(() => Team, (team) => team.creator)
   teamsCreated?: Team[];
 
   @OneToOne(() => Team, (team) => team.coach, { onDelete: 'CASCADE' })
-  @JoinColumn()
   team?: Team;
+  @Column({ nullable: true })
+  teamId?: number;
 
   @OneToOne(() => Player, (player) => player.user, { onDelete: 'CASCADE' })
-  @JoinColumn()
   player?: Player;
+  @Column({ nullable: true })
+  playerId?: number;
 }

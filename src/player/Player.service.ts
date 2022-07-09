@@ -32,6 +32,7 @@ export class PlayerService {
         login: player.login,
         password: player.password,
         orgId,
+        teamId,
       });
       if (!user) {
         throw new BadRequestException('Error user by player cannot be created');

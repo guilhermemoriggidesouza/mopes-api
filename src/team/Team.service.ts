@@ -41,9 +41,7 @@ export class TeamService {
       teamId: parseInt(id),
       orgId,
     });
-    console.log('saved players');
     payload.coachId = await this.saveCoach(payload.coach, parseInt(id));
-    console.log('saved coach');
     delete payload.players;
     delete payload.coach;
     return await this.teamRepository.update(id, payload);
@@ -51,9 +49,9 @@ export class TeamService {
 
   async saveCoach(user: User, id: number): Promise<number> {
     if (user.id) {
-      await this.teamRepository.update(id, { coachId: null });
       await this.userService.remove({ id: user.id.toString() });
     }
+    user.teamId = id;
     const userCreated = await this.userService.create(user);
     return userCreated.id;
   }
