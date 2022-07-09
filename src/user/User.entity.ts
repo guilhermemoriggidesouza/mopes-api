@@ -22,7 +22,7 @@ export class User {
   @Column({ type: 'date', nullable: true })
   birthday?: string;
 
-  @Column()
+  @Column({ unique: true })
   login: string;
 
   @Column()

@@ -43,19 +43,21 @@ export class TeamService {
       teamId: parseInt(id),
       orgId,
     });
-    payload.coachId = await this.saveCoach(payload.coach, parseInt(id));
+    payload.coachId = await this.updateOrCreate(payload.coach, parseInt(id));
     delete payload.players;
     delete payload.coach;
     return await this.teamRepository.update(id, payload);
   }
 
-  async saveCoach(user: User, id: number): Promise<number> {
-    if (user.id) {
-      await this.userService.remove({ id: user.id.toString() });
+  async updateOrCreate(user: User, id: number): Promise<number> {
+    if (!user.id) {
+      user.teamId = id;
+      const createdUser = await this.userService.create(user);
+      user.id = createdUser.id;
+    } else {
+      await this.userService.edit(user.id.toString(), user);
     }
-    user.teamId = id;
-    const userCreated = await this.userService.create(user);
-    return userCreated.id;
+    return user.id;
   }
 
   async savePlayers({
