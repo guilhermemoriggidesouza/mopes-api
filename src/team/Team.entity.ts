@@ -45,9 +45,6 @@ export class Team {
   @Column({ nullable: true })
   coachId: number;
 
-  @Column()
-  numberPlayers: number;
-
   @Column({ default: false })
   payedIntegration: boolean;
 

@@ -438,7 +438,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"copa terceirao\",\r\n    \"numberPlayers\": 12,\r\n    \"payedIntegration\": false\r\n}",
+							"raw": "{\r\n    \"name\": \"copa terceirao\",\r\n  \"payedIntegration\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
