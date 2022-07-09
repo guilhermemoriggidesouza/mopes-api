@@ -18,14 +18,15 @@ export class PlayerService {
     private readonly userService: UserService,
   ) {}
 
-  async create(Player: Player): Promise<Player> {
-    return this.playerRepository.save(Player);
+  async create(player: Player): Promise<Player> {
+    return this.playerRepository.save(player);
   }
 
   async createMany(players: Player[]) {
     await this.playerRepository.delete({
       id: In(players.map((player) => player.id).map((e) => e)),
     });
+    console.log("deleted player")
     const playersInsert = players.map(async (player) => {
       const user = await this.userService.create(player.user);
       if (!user) {
@@ -33,8 +34,9 @@ export class PlayerService {
       }
       player.userId = user.id;
       delete player.user;
-      await this.create(player);
+      return this.create(player);
     });
+    console.log("player saved")
     return await Promise.all(playersInsert);
   }
 

@@ -37,7 +37,9 @@ export class TeamService {
 
   async edit(id: string, payload: any): Promise<object> {
     await this.savePlayers({ players: payload.players, teamId: parseInt(id) });
+    console.log("saved players")
     payload.coachId = await this.saveCoach(payload.coach);
+    console.log("saved coach")
     delete payload.players;
     delete payload.coach;
     return await this.teamRepository.update(id, payload);
@@ -57,14 +59,10 @@ export class TeamService {
     teamId: number;
   }) {
     if (players && teamId) {
-      players = await Promise.all(
-        players.map(async (player) => {
-          return {
-            ...player,
-            teamId,
-          };
-        }),
-      );
+      players = players.map((player) => ({
+        ...player,
+        teamId,
+      }));
       await this.playerService.createMany(players);
     }
   }
