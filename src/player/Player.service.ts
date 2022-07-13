@@ -30,20 +30,19 @@ export class PlayerService {
       where: { teamId, playerId: Not(IsNull()) },
     });
     const playersInsert = players.map(async (player) => {
-      const playerInserted = await this.create({
-        name: player.name,
-        teamId: player.teamId,
-      });
       const user = await this.userService.create({
         name: player.name,
         login: player.login,
         password: player.password,
         orgId,
-        playerId: playerInserted.id,
         teamId: player.teamId,
       });
-      return this.playerRepository.update(playerInserted.id.toString(), {
-        userId: user.id,
+      const playerInserted = await this.create({
+        name: player.name,
+        teamId: player.teamId,
+      });
+      return this.userService.edit(user.id.toString(), {
+        playerId: playerInserted.id,
       });
     });
     return await Promise.all(playersInsert);

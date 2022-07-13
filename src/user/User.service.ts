@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './User.entity';
@@ -11,6 +11,8 @@ export class UserService {
   ) {}
 
   async create(User: User): Promise<User> {
+    if (this.userRepository.findOne({ where: { login: User.login } }))
+      throw new BadRequestException(`Login for player {${User.login}} already exists`)
     return this.userRepository.save(User);
   }
 
@@ -25,13 +27,7 @@ export class UserService {
     });
   }
 
-  async remove({
-    id,
-    where,
-  }: {
-    id?: string; 
-    where?: any;
-  }): Promise<object> {
+  async remove({ id, where }: { id?: string; where?: any }): Promise<object> {
     return await this.userRepository.delete(id || where);
   }
 
