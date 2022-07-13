@@ -11,8 +11,10 @@ export class UserService {
   ) {}
 
   async create(User: User): Promise<User> {
-    if (this.userRepository.findOne({ where: { login: User.login } }))
+    const user = await this.userRepository.findOne({ where: { login: User.login } })
+    if (user){
       throw new BadRequestException(`Login for player {${User.login}} already exists`)
+    }
     return this.userRepository.save(User);
   }
 

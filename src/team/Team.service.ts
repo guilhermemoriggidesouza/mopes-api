@@ -52,6 +52,7 @@ export class TeamService {
   async updateOrCreate(user: User, id: number): Promise<number> {
     if (!user.id) {
       user.teamId = id;
+      user.role = 'coach';
       const createdUser = await this.userService.create(user);
       user.id = createdUser.id;
     } else {
