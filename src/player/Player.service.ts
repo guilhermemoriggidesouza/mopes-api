@@ -40,6 +40,7 @@ export class PlayerService {
       const playerInserted = await this.create({
         name: player.name,
         teamId: player.teamId,
+        userId: user.id,
       });
       return this.userService.edit(user.id.toString(), {
         playerId: playerInserted.id,
