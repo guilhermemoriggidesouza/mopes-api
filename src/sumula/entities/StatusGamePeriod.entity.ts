@@ -5,30 +5,30 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
 
 @Entity()
 export class StatusGamePeriod {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @ManyToOne(() => PlayerInMatch)
-    playerInMatch: PlayerInMatch;
-    @Column()
-    playerInMatchId: number;
+  @ManyToOne(() => PlayerInMatch)
+  playerInMatch?: PlayerInMatch;
+  @Column({ nullable: true })
+  playerInMatchId?: number;
 
-    @ManyToOne(() => Sumula)
-    sumula: Sumula;
-    @Column()
-    sumulaId: number;
+  @ManyToOne(() => Sumula)
+  sumula: Sumula;
+  @Column()
+  sumulaId: number;
 
-    @ManyToOne(() => Team)
-    team: Team;
-    @Column()
-    teamId: number;
+  @ManyToOne(() => Team)
+  team: Team;
+  @Column()
+  teamId: number;
 
-    @Column({ default: 0 })
-    point: number;
+  @Column({ default: 0 })
+  point: number;
 
-    @Column({ default: 0 })
-    fault: number;
+  @Column({ default: 0 })
+  fault: number;
 
-    @Column({ default: 1 })
-    period: number;
+  @Column({ default: 1 })
+  period: number;
 }
