@@ -6,20 +6,20 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn
 @Entity()
 export class Championship {
     @PrimaryGeneratedColumn()
-    id: number;
+    id?: number;
 
     @Column()
     name: string;
     
     @Column({nullable: true})
-    logo: string;
+    logo?: string;
     
     @OneToOne(()=> User)
     @JoinColumn()
-    owner: User;
+    owner?: User;
 
     @Column({nullable: true})
-    ownerId: number;
+    ownerId?: number;
 
     @OneToMany(() => Team, team => team.championship)
     teams: Team[];

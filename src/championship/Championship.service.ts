@@ -1,4 +1,10 @@
-import { Dependencies, Injectable } from '@nestjs/common';
+import {
+  Dependencies,
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Championship } from './Championship.entity';
@@ -6,30 +12,52 @@ import { Championship } from './Championship.entity';
 @Injectable()
 @Dependencies(getRepositoryToken(Championship))
 export class ChampionshipService {
-    championshipRepository: Repository<Championship>;
+  championshipRepository: Repository<Championship>;
 
-    constructor(championshipRepository: Repository<Championship>) {
-        this.championshipRepository = championshipRepository;
+  constructor(championshipRepository: Repository<Championship>) {
+    this.championshipRepository = championshipRepository;
+  }
+
+  async create(
+    Championship: Championship,
+    ownerId: number,
+  ): Promise<Championship> {
+    return this.championshipRepository.save({ ...Championship, ownerId });
+  }
+
+  async findAll(where: object): Promise<Championship[]> {
+    return this.championshipRepository.find({ where });
+  }
+
+  async findOne({
+    id,
+    where,
+  }: {
+    id?: string;
+    where?: object;
+  }): Promise<Championship> {
+    return this.championshipRepository.findOne(id, {
+      where,
+      relations: ['users', 'owner'],
+    });
+  }
+
+  async remove(id: string): Promise<object> {
+    return await this.championshipRepository.delete(id);
+  }
+
+  async edit(id: string, payload: any, ownerId: number): Promise<object> {
+    if (!ownerId) {
+      throw new ForbiddenException(
+        'Cannot edit this championship with this user',
+      );
     }
-
-    async create(Championship: Championship, ownerId: number): Promise<Championship> {
-        return this.championshipRepository.save({ ...Championship, ownerId })
+    const user = await this.championshipRepository.findOne(id);
+    if (user.ownerId != ownerId) {
+      throw new ForbiddenException(
+        'Cannot edit this championship with this user',
+      );
     }
-
-    async findAll(): Promise<Championship[]> {
-        return this.championshipRepository.find();
-    }
-
-    async findOne({ id, where }: { id?: string, where?: object }): Promise<Championship> {
-        return this.championshipRepository.findOne(id, { where, relations: ['users', "owner"] });
-    }
-
-    async remove(id: string): Promise<object> {
-        return await this.championshipRepository.delete(id);
-    }
-
-    async edit(id: string, payload: object): Promise<object> {
-        return await this.championshipRepository.update(id, payload);
-    }
-
+    return await this.championshipRepository.update(id, payload);
+  }
 }
