@@ -38,7 +38,7 @@ export class ChampionshipService {
   }): Promise<Championship> {
     return this.championshipRepository.findOne(id, {
       where,
-      relations: ['users', 'owner'],
+      relations: ['teams', 'category', 'owner'],
     });
   }
 
