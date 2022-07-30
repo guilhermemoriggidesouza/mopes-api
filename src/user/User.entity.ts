@@ -10,6 +10,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
+import { Championship } from 'src/championship/Championship.entity';
 
 @Entity()
 export class User {
@@ -38,6 +39,9 @@ export class User {
 
   @OneToMany(() => Team, (team) => team.creator)
   teamsCreated?: Team[];
+
+  @OneToMany(() => Championship, (champ) => champ.owner)
+  championshipsOwner?: Championship[];
 
   @OneToOne(() => Team, (team) => team.coach)
   team?: Team;

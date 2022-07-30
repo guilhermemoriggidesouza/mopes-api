@@ -22,8 +22,7 @@ export class Championship {
   @Column({ nullable: true })
   logo?: string;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToOne(() => User)
   owner?: User;
 
   @Column({ nullable: true })
