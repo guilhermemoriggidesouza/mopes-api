@@ -34,7 +34,7 @@ export class Championship {
     categoryId: number;
 
     @Column()
-    numberKeys: number;
+    keys: number;
     
     @Column()
     gamePerKeys: number;
