@@ -8,6 +8,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   Request,
@@ -35,6 +36,12 @@ export class ChampionshipController {
     return await this.championshipService.findOne({ id });
   }
 
+  @Get(`${urlBase}/:id/start`)
+  @Roles(Role.Admin)
+  async start(@Param('id') id: string): Promise<any> {
+    return await this.championshipService.startChampionship({ id });
+  }
+
   @Post(`${urlBase}`)
   @Roles(Role.Admin)
   async createChampionship(
@@ -44,23 +51,23 @@ export class ChampionshipController {
     return await this.championshipService.create(payload, req.user?.id);
   }
 
-  @Post(`${urlBase}/:id`)
+  @Put(`${urlBase}/:id`)
   @Roles(Role.Admin)
   async editChampionships(
     @Param('id') id: string,
     @Body() payload: Championship,
     @Request() req: any,
-  ): Promise<object> {
+  ): Promise<any> {
     return await this.championshipService.edit(
       id,
-      payload as object,
+      payload as any,
       req.user?.id,
     );
   }
 
   @Delete(`${urlBase}/:id`)
   @Roles(Role.Admin)
-  async removeChampionship(@Param('id') id: string): Promise<object> {
+  async removeChampionship(@Param('id') id: string): Promise<any> {
     return await this.championshipService.remove(id);
   }
 }

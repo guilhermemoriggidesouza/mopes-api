@@ -2,7 +2,6 @@ import {
   Dependencies,
   Injectable,
   BadRequestException,
-  UnauthorizedException,
   ForbiddenException,
 } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -25,7 +24,7 @@ export class ChampionshipService {
     return this.championshipRepository.save({ ...championship, ownerId });
   }
 
-  async findAll(where: object): Promise<Championship[]> {
+  async findAll(where: any): Promise<Championship[]> {
     return this.championshipRepository.find({ where });
   }
 
@@ -34,7 +33,7 @@ export class ChampionshipService {
     where,
   }: {
     id?: string;
-    where?: object;
+    where?: any;
   }): Promise<Championship> {
     return this.championshipRepository.findOne(id, {
       where,
@@ -42,11 +41,11 @@ export class ChampionshipService {
     });
   }
 
-  async remove(id: string): Promise<object> {
+  async remove(id: string): Promise<any> {
     return await this.championshipRepository.delete(id);
   }
 
-  async edit(id: string, payload: any, ownerId: number): Promise<object> {
+  async edit(id: string, payload: any, ownerId: number): Promise<any> {
     if (!ownerId) {
       throw new ForbiddenException(
         'Cannot edit this championship with this user',
@@ -59,5 +58,20 @@ export class ChampionshipService {
       );
     }
     return await this.championshipRepository.update(id, payload);
+  }
+
+  async startChampionship({ id }: { id: string }) {
+    const championship = await this.championshipRepository.findOne(id, {
+      relations: ['teams'],
+    });
+    championship.teams.forEach((team) => {
+      if (!team.payedIntegration) {
+        throw new BadRequestException(
+          'Cannot start championship by #payedIntegration',
+        );
+      }
+    });
+
+    return this.championshipRepository.update(id, { started: true });
   }
 }
