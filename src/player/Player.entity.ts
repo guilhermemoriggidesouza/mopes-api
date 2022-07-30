@@ -13,7 +13,7 @@ import {
 @Entity()
 export class Player {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column()
   name: string;
