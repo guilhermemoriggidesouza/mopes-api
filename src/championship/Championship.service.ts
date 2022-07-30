@@ -19,10 +19,10 @@ export class ChampionshipService {
   }
 
   async create(
-    Championship: Championship,
+    championship: Championship,
     ownerId: number,
   ): Promise<Championship> {
-    return this.championshipRepository.save({ ...Championship, ownerId });
+    return this.championshipRepository.save({ ...championship, ownerId });
   }
 
   async findAll(where: object): Promise<Championship[]> {

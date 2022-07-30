@@ -14,7 +14,7 @@ import {
 @Entity()
 export class Championship {
   @PrimaryGeneratedColumn()
-  id?: number;
+  id: number;
 
   @Column()
   name: string;
