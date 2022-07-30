@@ -45,4 +45,7 @@ export class Championship {
 
   @Column({ default: 0 })
   gamePerKeys: number;
+
+  @Column({ default: false })
+  started: boolean;
 }
