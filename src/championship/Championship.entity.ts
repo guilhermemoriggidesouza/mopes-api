@@ -1,41 +1,49 @@
 import { Team } from 'src/team/Team.entity';
 import { CategoryGame } from './../categoryGame/CategoryGame.entity';
 import { User } from 'src/user/User.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
 
 @Entity()
 export class Championship {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Column()
-    name: string;
-    
-    @Column({nullable: true})
-    logo?: string;
-    
-    @OneToOne(()=> User)
-    @JoinColumn()
-    owner?: User;
+  @Column()
+  name: string;
 
-    @Column({nullable: true})
-    ownerId?: number;
+  @Column({ nullable: true })
+  logo?: string;
 
-    @OneToMany(() => Team, team => team.championship)
-    teams: Team[];
+  @OneToOne(() => User)
+  @JoinColumn()
+  owner?: User;
 
-    @Column({default: false})
-    payedIntegration: boolean;
+  @Column({ nullable: true })
+  ownerId?: number;
 
-    @ManyToOne(() => CategoryGame)
-    category: CategoryGame;
+  @OneToMany(() => Team, (team) => team.championship)
+  teams: Team[];
 
-    @Column({nullable: true})
-    categoryId: number;
+  @Column({ default: false })
+  payedIntegration: boolean;
 
-    @Column()
-    keys: number;
-    
-    @Column()
-    gamePerKeys: number;
+  @ManyToOne(() => CategoryGame)
+  category: CategoryGame;
+
+  @Column({ nullable: true })
+  categoryId: number;
+
+  @Column({ default: 0 })
+  keys: number;
+
+  @Column({ default: 0 })
+  gamePerKeys: number;
 }
