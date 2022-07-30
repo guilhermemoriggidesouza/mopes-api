@@ -32,4 +32,10 @@ export class Championship {
 
     @Column({nullable: true})
     categoryId: number;
+
+    @Column()
+    numberKeys: number;
+    
+    @Column()
+    gamePerKeys: number;
 }
