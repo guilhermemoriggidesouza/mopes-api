@@ -17,8 +17,8 @@ export class SumulaService {
     private readonly playerService: PlayerService,
   ) {}
 
-  async create(Sumula: Sumula, ownerId: number): Promise<Sumula> {
-    return this.sumulaRepository.save({ ...Sumula, ownerId });
+  async create(Sumula: Sumula): Promise<Sumula> {
+    return this.sumulaRepository.save({ ...Sumula });
   }
 
   async findAll(): Promise<Sumula[]> {

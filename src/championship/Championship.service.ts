@@ -4,23 +4,33 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
+import { SumulaService } from 'src/sumula/Sumula.service';
 import { Repository } from 'typeorm';
 import { Championship } from './Championship.entity';
 
 @Injectable()
 @Dependencies(getRepositoryToken(Championship))
 export class ChampionshipService {
-  championshipRepository: Repository<Championship>;
-
-  constructor(championshipRepository: Repository<Championship>) {
-    this.championshipRepository = championshipRepository;
-  }
+  constructor(
+    @InjectRepository(Championship)
+    private readonly championshipRepository: Repository<Championship>,
+    private readonly sumulasService: SumulaService,
+  ) {}
 
   async create(
     championship: Championship,
     ownerId: number,
   ): Promise<Championship> {
+    if (championship.keys > 0 && championship.gamePerKeys > 0) {
+      const sumulasToGen = championship.keys * championship.gamePerKeys;
+      Array.from(Array(sumulasToGen).keys()).forEach((key) => {
+        this.sumulasService.create({
+          championshipId: championship.id,
+          actualPeriod: 0,
+        });
+      });
+    }
     return this.championshipRepository.save({ ...championship, ownerId });
   }
 
@@ -37,7 +47,7 @@ export class ChampionshipService {
   }): Promise<Championship> {
     return this.championshipRepository.findOne(id, {
       where,
-      relations: ['teams', 'category', 'owner'],
+      relations: ['teams', 'category', 'owner', 'sumulas'],
     });
   }
 

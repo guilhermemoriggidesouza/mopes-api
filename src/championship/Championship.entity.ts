@@ -10,6 +10,7 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
+import { Sumula } from 'src/sumula/entities/Sumula.entity';
 
 @Entity()
 export class Championship {
@@ -48,4 +49,7 @@ export class Championship {
 
   @Column({ default: false })
   started: boolean;
+
+  @OneToMany(() => Sumula, (sumula) => sumula.championship)
+  sumulas?: Sumula[];
 }
