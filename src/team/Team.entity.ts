@@ -1,4 +1,4 @@
-import { Championship } from 'src/championship/Championship.entity';
+import { Championship } from 'src/championship/entities/Championship.entity';
 import { Org } from 'src/org/Org.entity';
 import { Player } from 'src/player/Player.entity';
 import { User } from 'src/user/User.entity';

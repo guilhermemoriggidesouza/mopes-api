@@ -10,7 +10,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { Championship } from 'src/championship/Championship.entity';
+import { Championship } from 'src/championship/entities/Championship.entity';
 
 @Entity()
 export class User {

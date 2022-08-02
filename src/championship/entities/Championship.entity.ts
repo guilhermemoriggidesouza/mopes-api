@@ -1,5 +1,5 @@
 import { Team } from 'src/team/Team.entity';
-import { CategoryGame } from './../categoryGame/CategoryGame.entity';
+import { CategoryGame } from '../../categoryGame/CategoryGame.entity';
 import { User } from 'src/user/User.entity';
 import {
   Entity,
@@ -11,6 +11,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { Sumula } from 'src/sumula/entities/Sumula.entity';
+import { ChampionshipKeys } from './ChampionshipKeys.entity';
 
 @Entity()
 export class Championship {
@@ -42,9 +43,6 @@ export class Championship {
   categoryId: number;
 
   @Column({ default: 0 })
-  keys: number;
-
-  @Column({ default: 0 })
   gamePerKeys: number;
 
   @Column({ default: false })
@@ -52,4 +50,7 @@ export class Championship {
 
   @OneToMany(() => Sumula, (sumula) => sumula.championship)
   sumulas?: Sumula[];
+
+  @OneToMany(() => ChampionshipKeys, (champKey) => champKey.championship)
+  keys: ChampionshipKeys[];
 }

@@ -1,6 +1,6 @@
 import { StatusGamePeriod } from './StatusGamePeriod.entity';
 import { PlayerInMatch } from './PlayerInMatch.entity';
-import { Championship } from '../../championship/Championship.entity';
+import { Championship } from '../../championship/entities/Championship.entity';
 import { Team } from 'src/team/Team.entity';
 import {
   Entity,
@@ -11,6 +11,7 @@ import {
   Column,
   OneToMany,
 } from 'typeorm';
+import { ChampionshipKeys } from 'src/championship/entities/ChampionshipKeys.entity';
 
 @Entity()
 export class Sumula {
@@ -20,6 +21,12 @@ export class Sumula {
   @ManyToMany(() => Team)
   @JoinTable()
   teams?: Team[];
+
+  @ManyToOne(() => ChampionshipKeys)
+  key?: ChampionshipKeys;
+
+  @Column()
+  keyId: number;
 
   @ManyToOne(() => Championship)
   championship?: Championship;

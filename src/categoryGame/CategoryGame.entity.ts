@@ -1,4 +1,4 @@
-import { Championship } from './../championship/Championship.entity';
+import { Championship } from '../championship/entities/Championship.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()

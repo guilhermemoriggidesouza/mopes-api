@@ -3,7 +3,7 @@ import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
 import { StatusGamePeriod } from './sumula/entities/StatusGamePeriod.entity';
 import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { CategoryGameModule } from './categoryGame/CategoryGame.module';
-import { Championship } from './championship/Championship.entity';
+import { Championship } from './championship/entities/Championship.entity';
 import { Player } from './player/Player.entity';
 import { AuthModule } from './auth/auth.module';
 import { Module } from '@nestjs/common';
