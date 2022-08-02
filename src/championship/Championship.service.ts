@@ -77,11 +77,11 @@ export class ChampionshipService {
       ownerId,
     });
 
-    await this.generateKeys({
-      keys: championship.keys,
-      gamePerKeys: championship.gamePerKeys,
-      championshipId: championshipGen.id,
-    });
+    // await this.generateKeys({
+    //   keys: championship.keys,
+    //   gamePerKeys: championship.gamePerKeys,
+    //   championshipId: championshipGen.id,
+    // });
   }
 
   async findAll(where: any): Promise<Championship[]> {
