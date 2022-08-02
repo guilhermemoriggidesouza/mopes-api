@@ -97,7 +97,7 @@ export class ChampionshipService {
   }): Promise<Championship> {
     return this.championshipRepository.findOne(id, {
       where,
-      relations: ['teams', 'category', 'owner', 'sumulas', 'keys'],
+      relations: ['teams', 'category', 'owner', 'keys.sumulas'],
     });
   }
 
