@@ -60,11 +60,11 @@ export class ChampionshipService {
             championshipId,
             name: this.getNameKey(index),
           });
-          await this.generateSumulas({
-            championshipId,
-            gamePerKeys,
-            keyId: keyGenerated.id,
-          });
+          // await this.generateSumulas({
+          //   championshipId,
+          //   gamePerKeys,
+          //   keyId: keyGenerated.id,
+          // });
         },
       );
       return Promise.all(createdKeys);
