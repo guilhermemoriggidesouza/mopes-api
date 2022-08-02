@@ -56,11 +56,7 @@ export class ChampionshipController {
     @Body() payload: Championship,
     @Request() req: any,
   ): Promise<any> {
-    return await this.championshipService.edit(
-      id,
-      payload as any,
-      req.user?.id,
-    );
+    return await this.championshipService.edit(id, payload as any);
   }
 
   @Delete(`${urlBase}/:id`)
