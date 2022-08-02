@@ -12,7 +12,6 @@ import { ChampionshipModule } from 'src/championship/Championship.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Sumula, PlayerInMatch, StatusGamePeriod]),
-    ChampionshipModule,
     PlayerModule,
   ],
   controllers: [SumulaController],

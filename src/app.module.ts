@@ -18,33 +18,45 @@ import { Team } from './team/Team.entity';
 import { PlayerModule } from './player/Player.module';
 import { CategoryGame } from './categoryGame/CategoryGame.entity';
 import { ChampionshipModule } from './championship/Championship.module';
+import { ChampionshipKeys } from './championship/entities/ChampionshipKeys.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forRoot({
-            type: 'postgres',
-            host: config.db_host,
-            port: parseInt(config.db_port),
-            username: config.db_username,
-            password: config.db_password,
-            database: config.db_database,
-            entities: [User, Org, Team, Player, Sumula, Championship, CategoryGame, StatusGamePeriod, PlayerInMatch],
-            synchronize: true,
-            ssl: true,
-            extra: {
-              ssl: {
-                  rejectUnauthorized: false
-              }
-          }
-        }),
-        UserModule,
-        PlayerModule,
-        AuthModule,
-        TeamModule,
-        OrgModule,
-        SumulaModule,
-        ChampionshipModule,
-        CategoryGameModule
-    ]
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: config.db_host,
+      port: parseInt(config.db_port),
+      username: config.db_username,
+      password: config.db_password,
+      database: config.db_database,
+      entities: [
+        User,
+        Org,
+        Team,
+        Player,
+        Sumula,
+        Championship,
+        ChampionshipKeys,
+        CategoryGame,
+        StatusGamePeriod,
+        PlayerInMatch,
+      ],
+      synchronize: true,
+      ssl: true,
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      },
+    }),
+    UserModule,
+    PlayerModule,
+    AuthModule,
+    TeamModule,
+    OrgModule,
+    SumulaModule,
+    ChampionshipModule,
+    CategoryGameModule,
+  ],
 })
-export class AppModule { }
+export class AppModule {}
