@@ -25,13 +25,7 @@ export class SumulaService {
     return this.sumulaRepository.find();
   }
 
-  async findOne({
-    id,
-    where,
-  }: {
-    id?: string;
-    where?: object;
-  }): Promise<Sumula> {
+  async findOne({ id, where }: { id?: string; where?: any }): Promise<Sumula> {
     return this.sumulaRepository.findOne(id, {
       where,
       relations: [
@@ -127,11 +121,11 @@ export class SumulaService {
     } as gameStatus;
   }
 
-  async remove(id: string): Promise<object> {
+  async remove(id: string): Promise<any> {
     return await this.sumulaRepository.delete(id);
   }
 
-  async edit(id: string, payload: object): Promise<object> {
+  async edit(id: string, payload: any): Promise<any> {
     return await this.sumulaRepository.update(id, payload);
   }
 
@@ -139,7 +133,7 @@ export class SumulaService {
     interaction: string,
     payload: any,
     id: string,
-  ): Promise<object> {
+  ): Promise<any> {
     const sumulaInfos = await this.findOne({ id });
     await this.playerInMatchRepository
       .increment(
@@ -164,13 +158,13 @@ export class SumulaService {
   async updatePlayerPointInMatch(
     id: string,
     payload: pointingSumula,
-  ): Promise<object> {
+  ): Promise<any> {
     return await this.addInteraction('point', payload, id);
   }
   async updatePlayerFaultInMatch(
     id: string,
     payload: faultingSumula,
-  ): Promise<object> {
+  ): Promise<any> {
     return await this.addInteraction('fault', payload, id);
   }
 
@@ -203,7 +197,7 @@ export class SumulaService {
     });
   }
 
-  async addingPlayerInMatch(id: string, payload: any): Promise<object> {
+  async addingPlayerInMatch(id: string, payload: any): Promise<any> {
     const {
       championship: { category },
     } = await this.sumulaRepository.findOne(id, {
