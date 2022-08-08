@@ -3,30 +3,24 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class CategoryGame {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name: string;
-    
-    @Column()
-    maxPoints: number;
-    
-    @Column()
-    maxPeriod: number;
+  @Column()
+  name: string;
 
-    @Column()
-    maxPlayersPerGame: number;
-    
-    @Column()
-    maxFaultsPerPlayer: number;
+  @Column()
+  maxPoints: number;
 
-    @Column({default: false})
-    pointsPerTeam: boolean;
+  @Column()
+  maxPeriod: number;
 
-    @Column({default: true})
-    stayFaults: boolean;
+  @Column()
+  maxPlayersPerGame: number;
 
-    @OneToMany(() => Championship, champ => champ.category)
-    championships: Championship[];
+  @Column()
+  maxFaultsPerPlayer: number;
+
+  @OneToMany(() => Championship, (champ) => champ.category)
+  championships: Championship[];
 }
