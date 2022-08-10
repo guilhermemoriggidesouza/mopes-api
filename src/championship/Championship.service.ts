@@ -77,11 +77,11 @@ export class ChampionshipService {
       ownerId,
     });
 
-    // await this.generateKeys({
-    //   keys: championship.keys,
-    //   gamePerKeys: championship.gamePerKeys,
-    //   championshipId: championshipGen.id,
-    // });
+    await this.generateKeys({
+      keys: championship.keys,
+      gamePerKeys: championship.gamePerKeys,
+      championshipId: championshipGen.id,
+    });
   }
 
   async findAll(where: any): Promise<Championship[]> {
@@ -97,7 +97,7 @@ export class ChampionshipService {
   }): Promise<Championship> {
     return this.championshipRepository.findOne(id, {
       where,
-      relations: ['teams', 'category', 'owner', 'keys.sumulas'],
+      relations: ['teams', 'category', 'owner', 'keys', 'keys.sumulas'],
     });
   }
 

@@ -49,8 +49,8 @@ export class Championship {
   started: boolean;
 
   @OneToMany(() => Sumula, (sumula) => sumula.championship)
-  sumulas?: Sumula[];
+  sumulasDeathMatch?: Sumula[];
 
-  // @OneToMany(() => ChampionshipKeys, (champKey) => champKey.championship)
-  // keys?: ChampionshipKeys[];
+  @OneToMany(() => ChampionshipKeys, (champKey) => champKey.championship)
+  keys?: ChampionshipKeys[];
 }

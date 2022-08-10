@@ -14,7 +14,7 @@ export class ChampionshipKeys {
   id: number;
 
   @ManyToOne(() => Championship)
-  championship?: Championship;
+  championship: Championship;
 
   @Column()
   championshipId: number;
