@@ -72,7 +72,6 @@ export class SumulaService {
   buildStatusPeriod(
     periods: number,
     statusGame: StatusGamePeriod[],
-    teams: Team[],
   ): periodInfos[] {
     return Array(periods).map((periodNumber) => {
       const period = statusGame.filter((stats) => stats.period == periodNumber);
@@ -102,7 +101,6 @@ export class SumulaService {
       periods: this.buildStatusPeriod(
         sumulaInfos.actualPeriod,
         sumulaInfos.statusGamePeriod,
-        sumulaInfos.teams,
       ),
     } as gameStatus;
   }
@@ -156,7 +154,7 @@ export class SumulaService {
 
   async removePlayerStatus(statusIds: string[]): Promise<any> {
     const status = await this.statusGamePeriodsRepository.findByIds(statusIds);
-    status.map(async (status) => {
+    return status.map(async (status) => {
       if (status.point > 0) {
         await this.playerInMatchRepository.decrement(
           { id: status.playerInMatchId },
