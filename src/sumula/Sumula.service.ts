@@ -38,22 +38,14 @@ export class SumulaService {
     });
   }
 
-  buildStatusTeam(
-    teams: Team[],
-    playerInMatchs: PlayerInMatch[],
-    pointsPerTeam: boolean,
-  ): team[] {
+  buildStatusTeam(teams: Team[], playerInMatchs: PlayerInMatch[]): team[] {
     return teams.map((teamItem) => {
       const playersOfTeam = playerInMatchs.filter(
         (playerInMatch) => playerInMatch.teamId == teamItem.id,
       );
-      const points = pointsPerTeam
-        ? playersOfTeam[0].point
-        : playersOfTeam
-            .map((player) => player.point)
-            .reduce(
-              (currentValue, previousValue) => currentValue + previousValue,
-            );
+      const points = playersOfTeam
+        .map((player) => player.point)
+        .reduce((currentValue, previousValue) => currentValue + previousValue);
       return {
         name: teamItem.name,
         points: points,
@@ -80,16 +72,12 @@ export class SumulaService {
   buildStatusPeriod(
     periods: number,
     statusGame: StatusGamePeriod[],
-    pointsPerTeam: boolean,
     teams: Team[],
   ): periodInfos[] {
     return Array(periods).map((periodNumber) => {
       const period = statusGame.filter((stats) => stats.period == periodNumber);
-      const points = pointsPerTeam
-        ? this.getPointsByTeamInPeriod(period, teams)
-        : period.map((stats) => stats.point).reduce((cv, pv) => cv + pv);
       return {
-        points: points,
+        points: period.map((stats) => stats.point).reduce((cv, pv) => cv + pv),
         faults: period.map((stats) => stats.fault).reduce((cv, pv) => cv + pv),
       };
     });
@@ -110,12 +98,10 @@ export class SumulaService {
       teams: this.buildStatusTeam(
         sumulaInfos.teams,
         sumulaInfos.playerInMatchs,
-        sumulaInfos.championship.category.pointsPerTeam,
       ),
       periods: this.buildStatusPeriod(
         sumulaInfos.actualPeriod,
         sumulaInfos.statusGamePeriod,
-        sumulaInfos.championship.category.pointsPerTeam,
         sumulaInfos.teams,
       ),
     } as gameStatus;
