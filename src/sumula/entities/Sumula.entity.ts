@@ -23,10 +23,10 @@ export class Sumula {
   teams?: Team[];
 
   @ManyToOne(() => ChampionshipKeys)
-  key?: ChampionshipKeys;
+  championshipKeys?: ChampionshipKeys;
 
   @Column()
-  keyId: number;
+  championshipKeysId: number;
 
   @ManyToOne(() => Championship)
   championship?: Championship;

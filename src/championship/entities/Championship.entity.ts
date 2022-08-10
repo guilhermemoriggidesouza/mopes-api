@@ -52,5 +52,5 @@ export class Championship {
   sumulasDeathMatch?: Sumula[];
 
   @OneToMany(() => ChampionshipKeys, (champKey) => champKey.championship)
-  keys?: ChampionshipKeys[];
+  championshipKeys?: ChampionshipKeys[];
 }

@@ -26,18 +26,18 @@ export class ChampionshipService {
   async generateSumulas({
     championshipId,
     gamePerKeys,
-    keyId,
+    championshipKeysId,
   }: {
     championshipId: number;
     gamePerKeys: number;
-    keyId: number;
+    championshipKeysId: number;
   }) {
     const createdSumulas = Array.from(Array(gamePerKeys).keys()).map(
       async (gamePerKey) => {
         return this.sumulasService.create({
           championshipId,
           actualPeriod: 0,
-          keyId,
+          championshipKeysId,
         });
       },
     );
@@ -63,7 +63,7 @@ export class ChampionshipService {
           await this.generateSumulas({
             championshipId,
             gamePerKeys,
-            keyId: keyGenerated.id,
+            championshipKeysId: keyGenerated.id,
           });
         },
       );
