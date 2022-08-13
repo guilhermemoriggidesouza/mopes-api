@@ -8,8 +8,8 @@ import { SumulaModule } from 'src/sumula/Sumula.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Championship, ChampionshipKeys]),
     SumulaModule,
+    TypeOrmModule.forFeature([Championship, ChampionshipKeys]),
   ],
   controllers: [ChampionshipController],
   providers: [ChampionshipService],

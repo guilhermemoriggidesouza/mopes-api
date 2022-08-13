@@ -7,7 +7,6 @@ import { SumulaService } from './Sumula.service';
 import { Sumula } from './entities/Sumula.entity';
 import { PlayerModule } from 'src/player/Player.module';
 import { StatusGamePeriod } from './entities/StatusGamePeriod.entity';
-import { ChampionshipModule } from 'src/championship/Championship.module';
 
 @Module({
   imports: [
