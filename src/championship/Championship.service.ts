@@ -12,6 +12,7 @@ export class ChampionshipService {
   constructor(
     @InjectRepository(Championship)
     private readonly championshipRepository: Repository<Championship>,
+    @InjectRepository(ChampionshipKeys)
     private readonly championshipKeyRepository: Repository<ChampionshipKeys>,
     private readonly sumulasService: SumulaService,
   ) {}
