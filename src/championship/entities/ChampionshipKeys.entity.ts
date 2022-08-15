@@ -13,6 +13,9 @@ export class ChampionshipKeys {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  name: string;
+
   @ManyToOne(() => Championship)
   championship: Championship;
 

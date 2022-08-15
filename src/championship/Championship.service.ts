@@ -7,21 +7,26 @@ import { ChampionshipKeys } from './entities/ChampionshipKeys.entity';
 import { NAME_KEYS } from './_nameKeys';
 
 @Injectable()
-@Dependencies(getRepositoryToken(Championship))
 export class ChampionshipService {
   constructor(
     @InjectRepository(Championship)
     private readonly championshipRepository: Repository<Championship>,
+
     @InjectRepository(ChampionshipKeys)
     private readonly championshipKeyRepository: Repository<ChampionshipKeys>,
+
     private readonly sumulasService: SumulaService,
   ) {}
 
-  async getNameKey(index) {
+  getNameKey(index): string {
     if (NAME_KEYS[index]) {
       return NAME_KEYS[index];
     }
     return NAME_KEYS[index] + index;
+  }
+
+  createArray(number) {
+    return Array.from({ length: number }, (_, i) => i + 1);
   }
 
   async generateSumulas({
@@ -33,7 +38,7 @@ export class ChampionshipService {
     gamePerKeys: number;
     championshipKeysId: number;
   }) {
-    const createdSumulas = Array.from(Array(gamePerKeys).keys()).map(
+    const createdSumulas = this.createArray(gamePerKeys).map(
       async (gamePerKey) => {
         return this.sumulasService.create({
           championshipId,
@@ -55,19 +60,18 @@ export class ChampionshipService {
     championshipId: number;
   }) {
     if (keys > 0 && gamePerKeys > 0) {
-      const createdKeys = Array.from(Array(keys).keys()).map(
-        async (key, index) => {
-          const keyGenerated = await this.championshipKeyRepository.save({
-            championshipId,
-            name: this.getNameKey(index),
-          });
-          await this.generateSumulas({
-            championshipId,
-            gamePerKeys,
-            championshipKeysId: keyGenerated.id,
-          });
-        },
-      );
+      console.log();
+      const createdKeys = this.createArray(keys).map(async (key, index) => {
+        const keyGenerated = await this.championshipKeyRepository.save({
+          championshipId,
+          name: this.getNameKey(index),
+        });
+        await this.generateSumulas({
+          championshipId,
+          gamePerKeys,
+          championshipKeysId: keyGenerated.id,
+        });
+      });
       return Promise.all(createdKeys);
     }
   }
@@ -98,11 +102,24 @@ export class ChampionshipService {
   }): Promise<Championship> {
     return this.championshipRepository.findOne(id, {
       where,
-      relations: ['teams', 'category', 'owner', 'keys', 'keys.sumulas'],
+      relations: [
+        'teams',
+        'category',
+        'owner',
+        'championshipKeys',
+        'championshipKeys.sumulas',
+        'championshipKeys.sumulas.teams',
+      ],
     });
   }
 
   async remove(id: string): Promise<any> {
+    await this.sumulasService.remove({
+      where: { championshipId: parseInt(id) },
+    });
+    await this.championshipKeyRepository.delete({
+      championshipId: parseInt(id),
+    });
     return await this.championshipRepository.delete(id);
   }
 

@@ -105,8 +105,8 @@ export class SumulaService {
     } as gameStatus;
   }
 
-  async remove(id: string): Promise<any> {
-    return await this.sumulaRepository.delete(id);
+  async remove({ id, where }: { id?: string; where?: any }): Promise<any> {
+    return await this.sumulaRepository.delete(id || where);
   }
 
   async edit(id: string, payload: any): Promise<any> {
@@ -130,7 +130,7 @@ export class SumulaService {
         payload.data[interaction],
       )
       .then((response) => response.raw);
-    return await this.statusGamePeriodsRepository.save({
+    return this.statusGamePeriodsRepository.save({
       playerInMatchId: payload.id,
       sumulaId: id,
       teamId: payload.teamId,
@@ -169,14 +169,14 @@ export class SumulaService {
           status.fault,
         );
       }
-      return await this.statusGamePeriodsRepository.delete({
+      return this.statusGamePeriodsRepository.delete({
         id: status.id,
       });
     });
   }
 
   async findAllPlayerInMatch(id: string): Promise<PlayerInMatch[]> {
-    return await this.playerInMatchRepository.find({
+    return this.playerInMatchRepository.find({
       sumulaId: parseInt(id),
     });
   }
@@ -191,7 +191,7 @@ export class SumulaService {
     if (player.infractions == category.maxFaultsPerPlayer) {
       throw new BadRequestException('Error player cannot be insert game');
     }
-    return await this.playerInMatchRepository.save({
+    return this.playerInMatchRepository.save({
       sumulaId: parseInt(id),
       ...payload,
     });

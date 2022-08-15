@@ -47,13 +47,13 @@ export class TeamController {
     @Param('id') id: string,
     @Body() payload: Team,
     @Request() req: any,
-  ): Promise<object> {
-    return await this.teamService.edit(id, payload as object, req.user.orgId);
+  ): Promise<any> {
+    return await this.teamService.edit(id, payload as any, req.user.orgId);
   }
 
   @Delete(`${urlBase}/:id`)
   @Roles(Role.Coach, Role.Admin)
-  async removeTeam(@Param('id') id: string): Promise<object> {
+  async removeTeam(@Param('id') id: string): Promise<any> {
     return await this.teamService.remove(id);
   }
 }

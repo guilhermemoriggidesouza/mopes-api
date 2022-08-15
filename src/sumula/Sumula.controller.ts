@@ -60,7 +60,7 @@ export class SumulaController {
   @Delete(`${urlBase}/:id`)
   @Roles(Role.Admin)
   async removeSumula(@Param('id') id: string): Promise<any> {
-    return await this.sumulaService.remove(id);
+    return await this.sumulaService.remove({ id });
   }
 
   @Post(`${urlBase}/:id/pointing`)
