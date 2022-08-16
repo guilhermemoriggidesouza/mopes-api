@@ -7,11 +7,13 @@ import { SumulaService } from './Sumula.service';
 import { Sumula } from './entities/Sumula.entity';
 import { PlayerModule } from 'src/player/Player.module';
 import { StatusGamePeriod } from './entities/StatusGamePeriod.entity';
+import { TeamModule } from 'src/team/Team.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Sumula, PlayerInMatch, StatusGamePeriod]),
     PlayerModule,
+    TeamModule,
   ],
   controllers: [SumulaController],
   providers: [SumulaService, SumulaGateway],

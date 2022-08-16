@@ -1,5 +1,6 @@
 import { Dependencies, Injectable, BadRequestException } from '@nestjs/common';
 import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
+import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { SumulaService } from 'src/sumula/Sumula.service';
 import { Repository } from 'typeorm';
 import { Championship } from './entities/Championship.entity';
@@ -32,22 +33,20 @@ export class ChampionshipService {
   async generateSumulas({
     championshipId,
     gamePerKeys,
-    championshipKeysId,
+    championshipKeys,
   }: {
     championshipId: number;
     gamePerKeys: number;
-    championshipKeysId: number;
+    championshipKeys: any[];
   }) {
-    const createdSumulas = this.createArray(gamePerKeys).map(
-      async (gamePerKey) => {
-        return this.sumulasService.create({
-          championshipId,
-          actualPeriod: 0,
-          championshipKeysId,
-        });
-      },
+    const sumulasToCreate = championshipKeys.map((championshipKey) =>
+      this.createArray(gamePerKeys).map(() => ({
+        championshipId,
+        actualPeriod: 0,
+        championshipKeysId: championshipKey.id,
+      })),
     );
-    return Promise.all(createdSumulas);
+    return this.sumulasService.createMany(sumulasToCreate.flat());
   }
 
   async generateKeys({
@@ -60,19 +59,19 @@ export class ChampionshipService {
     championshipId: number;
   }) {
     if (keys > 0 && gamePerKeys > 0) {
-      console.log();
-      const createdKeys = this.createArray(keys).map(async (key, index) => {
-        const keyGenerated = await this.championshipKeyRepository.save({
-          championshipId,
-          name: this.getNameKey(index),
-        });
-        await this.generateSumulas({
-          championshipId,
-          gamePerKeys,
-          championshipKeysId: keyGenerated.id,
-        });
+      const createdKeys = await Promise.all(
+        this.createArray(keys).map(async (key, index) => {
+          return this.championshipKeyRepository.save({
+            championshipId,
+            name: this.getNameKey(index),
+          });
+        }),
+      );
+      await this.generateSumulas({
+        championshipId,
+        gamePerKeys,
+        championshipKeys: createdKeys,
       });
-      return Promise.all(createdKeys);
     }
   }
 

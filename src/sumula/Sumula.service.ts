@@ -3,22 +3,33 @@ import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
 import { StatusGamePeriod } from './entities/StatusGamePeriod.entity';
 import { Team } from 'src/team/Team.entity';
 import { Dependencies, Injectable, BadRequestException } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
 import { Sumula } from './entities/Sumula.entity';
+import { TeamService } from 'src/team/Team.service';
 
 @Injectable()
-@Dependencies(getRepositoryToken(Sumula))
 export class SumulaService {
   constructor(
+    @InjectRepository(Sumula)
     private readonly sumulaRepository: Repository<Sumula>,
+    @InjectRepository(PlayerInMatch)
     private readonly playerInMatchRepository: Repository<PlayerInMatch>,
+    @InjectRepository(StatusGamePeriod)
     private readonly statusGamePeriodsRepository: Repository<StatusGamePeriod>,
     private readonly playerService: PlayerService,
+    private readonly teamsService: TeamService,
   ) {}
 
-  async create(Sumula: Sumula): Promise<Sumula> {
-    return this.sumulaRepository.save({ ...Sumula });
+  async create(sumula: Sumula): Promise<Sumula> {
+    return this.sumulaRepository.save({ ...sumula });
+  }
+  async createMany(sumulas: Sumula[]): Promise<any> {
+    return this.sumulaRepository
+      .createQueryBuilder()
+      .insert()
+      .values(sumulas)
+      .execute();
   }
 
   async findAll(): Promise<Sumula[]> {
@@ -107,6 +118,17 @@ export class SumulaService {
 
   async remove({ id, where }: { id?: string; where?: any }): Promise<any> {
     return await this.sumulaRepository.delete(id || where);
+  }
+
+  async addTeams(id: string, payload: any): Promise<any> {
+    const sumula = await this.sumulaRepository.findOne(id);
+    if (payload.teams) {
+      const ids = payload.teams.map((id) => parseInt(id));
+      sumula.teams = await this.teamsService.findAll({
+        id: In(ids),
+      });
+    }
+    return this.sumulaRepository.save(sumula);
   }
 
   async edit(id: string, payload: any): Promise<any> {

@@ -26,13 +26,13 @@ export class Sumula {
   championshipKeys?: ChampionshipKeys;
 
   @Column()
-  championshipKeysId: number;
+  championshipKeysId?: number;
 
   @ManyToOne(() => Championship)
   championship?: Championship;
 
   @Column()
-  championshipId: number;
+  championshipId?: number;
 
   @OneToMany(() => PlayerInMatch, (GC) => GC.sumula)
   playerInMatchs?: PlayerInMatch[];
@@ -41,5 +41,5 @@ export class Sumula {
   statusGamePeriod?: StatusGamePeriod[];
 
   @Column()
-  actualPeriod: number;
+  actualPeriod?: number;
 }

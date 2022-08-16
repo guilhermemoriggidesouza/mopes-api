@@ -20,24 +20,24 @@ export class TeamService {
     return this.teamRepository.save({ ...Team, creatorId, orgId });
   }
 
-  async findAll(where?: object): Promise<Team[]> {
+  async findAll(where?: any): Promise<Team[]> {
     return this.teamRepository.find({ where });
   }
 
-  async findOne({ id, where }: { id?: string; where?: object }): Promise<Team> {
+  async findOne({ id, where }: { id?: string; where?: any }): Promise<Team> {
     return this.teamRepository.findOne(id, {
       where,
       relations: ['players', 'players.user', 'coach'],
     });
   }
 
-  async remove(id: string): Promise<object> {
+  async remove(id: string): Promise<any> {
     await this.playerService.remove({ where: { teamId: id } });
     await this.teamRepository.delete(id);
     return await this.userService.remove({ where: { teamId: id } });
   }
 
-  async edit(id: string, payload: any, orgId: number): Promise<object> {
+  async edit(id: string, payload: any, orgId: number): Promise<any> {
     await this.savePlayers({
       players: payload.players,
       teamId: parseInt(id),

@@ -10,6 +10,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   Request,
   UseGuards,
@@ -48,13 +49,23 @@ export class SumulaController {
     return await this.sumulaService.create(payload);
   }
 
-  @Post(`${urlBase}/:id`)
+  @Put(`${urlBase}/:id`)
   @Roles(Role.Admin)
   async editSumulas(
     @Param('id') id: string,
     @Body() payload: Sumula,
   ): Promise<any> {
+    console.log('testeeeee2');
     return await this.sumulaService.edit(id, payload as any);
+  }
+
+  @Put(`${urlBase}/:id/teams`)
+  @Roles(Role.Admin)
+  async addTeams(
+    @Param('id') id: string,
+    @Body() payload: Sumula,
+  ): Promise<any> {
+    return await this.sumulaService.addTeams(id, payload as any);
   }
 
   @Delete(`${urlBase}/:id`)

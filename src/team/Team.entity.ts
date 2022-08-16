@@ -15,7 +15,7 @@ import {
 @Entity()
 export class Team {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column({ nullable: true })
   name: string;
@@ -36,7 +36,7 @@ export class Team {
   championship: Championship;
 
   @Column({ nullable: true })
-  championshipId: number;
+  championshipId?: number;
 
   @OneToOne(() => User, (user) => user.team)
   @JoinColumn()
