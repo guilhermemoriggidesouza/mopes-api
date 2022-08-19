@@ -25,7 +25,7 @@ export class Sumula {
   @ManyToOne(() => ChampionshipKeys)
   championshipKeys?: ChampionshipKeys;
 
-  @Column()
+  @Column({ nullable: true })
   championshipKeysId?: number;
 
   @ManyToOne(() => Championship)

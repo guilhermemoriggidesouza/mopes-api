@@ -26,18 +26,18 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async findOne({ id, where }: { id?: string; where?: object }): Promise<User> {
+  async findOne({ id, where }: { id?: string; where?: any }): Promise<User> {
     return this.userRepository.findOne(id, {
       where,
       relations: ['org', 'teamsCreated'],
     });
   }
 
-  async remove({ id, where }: { id?: string; where?: any }): Promise<object> {
+  async remove({ id, where }: { id?: string; where?: any }): Promise<any> {
     return await this.userRepository.delete(id || where);
   }
 
-  async edit(id: string, payload: object): Promise<object> {
+  async edit(id: string, payload: any): Promise<any> {
     return await this.userRepository.update(id, payload);
   }
 }

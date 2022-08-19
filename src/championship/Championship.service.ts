@@ -1,8 +1,14 @@
-import { Dependencies, Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Dependencies,
+  Injectable,
+  BadRequestException,
+  forwardRef,
+  Inject,
+} from '@nestjs/common';
 import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
-import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { SumulaService } from 'src/sumula/Sumula.service';
-import { Repository } from 'typeorm';
+import { TeamService } from 'src/team/Team.service';
+import { In, Repository } from 'typeorm';
 import { Championship } from './entities/Championship.entity';
 import { ChampionshipKeys } from './entities/ChampionshipKeys.entity';
 import { NAME_KEYS } from './_nameKeys';
@@ -16,7 +22,9 @@ export class ChampionshipService {
     @InjectRepository(ChampionshipKeys)
     private readonly championshipKeyRepository: Repository<ChampionshipKeys>,
 
+    @Inject(forwardRef(() => SumulaService))
     private readonly sumulasService: SumulaService,
+    private readonly teamsService: TeamService,
   ) {}
 
   getNameKey(index): string {
@@ -33,29 +41,39 @@ export class ChampionshipService {
   async generateSumulas({
     championshipId,
     gamePerKeys,
+    blankGames,
     championshipKeys,
   }: {
     championshipId: number;
     gamePerKeys: number;
+    blankGames: number;
     championshipKeys: any[];
   }) {
-    const sumulasToCreate = championshipKeys.map((championshipKey) =>
+    const sumulasToCreate: any = championshipKeys.map((championshipKey) =>
       this.createArray(gamePerKeys).map(() => ({
         championshipId,
         actualPeriod: 0,
         championshipKeysId: championshipKey.id,
       })),
     );
+    sumulasToCreate.push(
+      this.createArray(blankGames).map(() => ({
+        championshipId,
+        actualPeriod: 0,
+      })),
+    );
     return this.sumulasService.createMany(sumulasToCreate.flat());
   }
 
-  async generateKeys({
+  async generateGames({
     keys,
     gamePerKeys,
+    blankGames,
     championshipId,
   }: {
     keys: number;
     gamePerKeys: number;
+    blankGames: number;
     championshipId: number;
   }) {
     if (keys > 0 && gamePerKeys > 0) {
@@ -70,6 +88,7 @@ export class ChampionshipService {
       await this.generateSumulas({
         championshipId,
         gamePerKeys,
+        blankGames,
         championshipKeys: createdKeys,
       });
     }
@@ -80,10 +99,10 @@ export class ChampionshipService {
       ...championship,
       ownerId,
     });
-
-    await this.generateKeys({
+    await this.generateGames({
       keys: championship.keys,
       gamePerKeys: championship.gamePerKeys,
+      blankGames: championship.blankGames,
       championshipId: championshipGen.id,
     });
   }
@@ -105,6 +124,7 @@ export class ChampionshipService {
         'teams',
         'category',
         'owner',
+        'sumulas',
         'championshipKeys',
         'championshipKeys.sumulas',
         'championshipKeys.sumulas.teams',
@@ -130,6 +150,11 @@ export class ChampionshipService {
     const championship = await this.championshipRepository.findOne(id, {
       relations: ['teams'],
     });
+    if (championship.teams.length == 0) {
+      throw new BadRequestException(
+        'Cannot start championship by #withoutTeams',
+      );
+    }
     championship.teams.forEach((team) => {
       if (!team.payedIntegration) {
         throw new BadRequestException(
@@ -139,5 +164,19 @@ export class ChampionshipService {
     });
 
     return this.championshipRepository.update(id, { started: true });
+  }
+
+  async addTeamChampionship({
+    teamsIds,
+    championshipId,
+  }: {
+    teamsIds: number[];
+    championshipId: number;
+  }) {
+    const teams = await this.teamsService.findAll({ id: In(teamsIds) });
+    const Championship = await this.championshipRepository.findOne(
+      championshipId,
+    );
+    return this.championshipRepository.save({ ...Championship, teams });
   }
 }

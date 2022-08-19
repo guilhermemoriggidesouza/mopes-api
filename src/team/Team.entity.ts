@@ -10,6 +10,8 @@ import {
   OneToMany,
   JoinColumn,
   ManyToOne,
+  JoinTable,
+  ManyToMany,
 } from 'typeorm';
 
 @Entity()
@@ -32,11 +34,9 @@ export class Team {
   @Column()
   orgId: number;
 
-  @ManyToOne(() => Championship)
-  championship: Championship;
-
-  @Column({ nullable: true })
-  championshipId?: number;
+  @ManyToMany(() => Championship)
+  @JoinTable()
+  championships: Championship[];
 
   @OneToOne(() => User, (user) => user.team)
   @JoinColumn()

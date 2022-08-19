@@ -9,6 +9,8 @@ import {
   OneToMany,
   JoinColumn,
   ManyToOne,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { ChampionshipKeys } from './ChampionshipKeys.entity';
@@ -30,7 +32,8 @@ export class Championship {
   @Column({ nullable: true })
   ownerId?: number;
 
-  @OneToMany(() => Team, (team) => team.championship)
+  @ManyToMany(() => Team)
+  @JoinTable()
   teams: Team[];
 
   @Column({ default: false })
@@ -49,7 +52,7 @@ export class Championship {
   started: boolean;
 
   @OneToMany(() => Sumula, (sumula) => sumula.championship)
-  sumulasDeathMatch?: Sumula[];
+  sumulas?: Sumula[];
 
   @OneToMany(() => ChampionshipKeys, (champKey) => champKey.championship)
   championshipKeys?: ChampionshipKeys[];

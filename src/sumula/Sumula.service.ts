@@ -2,11 +2,18 @@ import { PlayerService } from '../player/Player.service';
 import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
 import { StatusGamePeriod } from './entities/StatusGamePeriod.entity';
 import { Team } from 'src/team/Team.entity';
-import { Dependencies, Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Dependencies,
+  Injectable,
+  BadRequestException,
+  forwardRef,
+  Inject,
+} from '@nestjs/common';
 import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Sumula } from './entities/Sumula.entity';
 import { TeamService } from 'src/team/Team.service';
+import { ChampionshipService } from 'src/championship/Championship.service';
 
 @Injectable()
 export class SumulaService {
@@ -19,6 +26,7 @@ export class SumulaService {
     private readonly statusGamePeriodsRepository: Repository<StatusGamePeriod>,
     private readonly playerService: PlayerService,
     private readonly teamsService: TeamService,
+    private readonly championshipService: ChampionshipService,
   ) {}
 
   async create(sumula: Sumula): Promise<Sumula> {
@@ -127,8 +135,13 @@ export class SumulaService {
       sumula.teams = await this.teamsService.findAll({
         id: In(ids),
       });
+      this.championshipService.addTeamChampionship({
+        teamsIds: sumula.teams.map((team) => team.id),
+        championshipId: sumula.championshipId,
+      });
     }
-    return this.sumulaRepository.save(sumula);
+    await this.sumulaRepository.save(sumula);
+    return sumula;
   }
 
   async edit(id: string, payload: any): Promise<any> {
