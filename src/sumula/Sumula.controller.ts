@@ -61,11 +61,11 @@ export class SumulaController {
 
   @Put(`${urlBase}/:id/teams`)
   @Roles(Role.Admin)
-  async addTeams(
+  async updateTeams(
     @Param('id') id: string,
     @Body() payload: Sumula,
   ): Promise<any> {
-    return await this.sumulaService.addTeams(id, payload as any);
+    return await this.sumulaService.updateTeams(id, payload as any);
   }
 
   @Delete(`${urlBase}/:id`)

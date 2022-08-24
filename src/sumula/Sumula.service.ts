@@ -128,18 +128,17 @@ export class SumulaService {
     return await this.sumulaRepository.delete(id || where);
   }
 
-  async addTeams(id: string, payload: any): Promise<any> {
+  async updateTeams(id: string, payload: any): Promise<any> {
     const sumula = await this.sumulaRepository.findOne(id);
     if (payload.teams) {
       const ids = payload.teams.map((id) => parseInt(id));
       sumula.teams = await this.teamsService.findAll({
         id: In(ids),
       });
-      this.championshipService.addTeamChampionship({
-        teamsIds: sumula.teams.map((team) => team.id),
-        championshipId: sumula.championshipId,
-      });
     }
+    this.championshipService.syncTeamChampionship({
+      championshipId: sumula.championshipId,
+    });
     await this.sumulaRepository.save(sumula);
     return sumula;
   }

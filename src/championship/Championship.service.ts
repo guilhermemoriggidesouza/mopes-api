@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
 import { SumulaService } from 'src/sumula/Sumula.service';
+import { Team } from 'src/team/Team.entity';
 import { TeamService } from 'src/team/Team.service';
 import { In, Repository } from 'typeorm';
 import { Championship } from './entities/Championship.entity';
@@ -166,17 +167,35 @@ export class ChampionshipService {
     return this.championshipRepository.update(id, { started: true });
   }
 
-  async addTeamChampionship({
-    teamsIds,
-    championshipId,
-  }: {
-    teamsIds: number[];
-    championshipId: number;
-  }) {
-    const teams = await this.teamsService.findAll({ id: In(teamsIds) });
-    const Championship = await this.championshipRepository.findOne(
+  unifiqueArray(arrayToUnify: any[]) {
+    return arrayToUnify.filter((value, index) => {
+      const _value = JSON.stringify(value);
+      return (
+        index ===
+        arrayToUnify.findIndex((obj) => {
+          return JSON.stringify(obj) === _value;
+        })
+      );
+    });
+  }
+
+  async syncTeamChampionship({ championshipId }: { championshipId: number }) {
+    const championship = await this.championshipRepository.findOne(
       championshipId,
+      {
+        relations: [
+          'championshipKeys',
+          'championshipKeys.sumulas',
+          'championshipKeys.sumulas.teams',
+        ],
+      },
     );
-    return this.championshipRepository.save({ ...Championship, teams });
+    championship.teams = this.unifiqueArray([
+      ...championship.championshipKeys.flatMap((champKey) => {
+        return champKey.sumulas.flatMap((sumula) => sumula.teams);
+      }),
+    ]);
+
+    return this.championshipRepository.save({ ...championship });
   }
 }
