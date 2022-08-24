@@ -41,7 +41,9 @@ export class SumulaService {
   }
 
   async findAll(): Promise<Sumula[]> {
-    return this.sumulaRepository.find();
+    return this.sumulaRepository.find({
+      relations: ['teams', 'championship', 'championship.category'],
+    });
   }
 
   async findOne({ id, where }: { id?: string; where?: any }): Promise<Sumula> {
