@@ -80,7 +80,7 @@ export class SumulaController {
     @Param('id') id: string,
     @Body() payload: pointingSumula,
   ): Promise<any> {
-    return await this.sumulaService.updatePlayerPointInMatch(id, payload);
+    return await this.sumulaService.createPlayerStatusInMatch(id, payload);
   }
 
   @Post(`${urlBase}/:id/faulting`)
@@ -89,7 +89,7 @@ export class SumulaController {
     @Param('id') id: string,
     @Body() payload: faultingSumula,
   ): Promise<any> {
-    const interaction = await this.sumulaService.updatePlayerFaultInMatch(
+    const interaction = await this.sumulaService.createPlayerStatusInMatch(
       id,
       payload,
     );

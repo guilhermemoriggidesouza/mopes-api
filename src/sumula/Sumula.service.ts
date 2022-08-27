@@ -24,6 +24,7 @@ export class SumulaService {
     private readonly playerInMatchRepository: Repository<PlayerInMatch>,
     @InjectRepository(StatusGamePeriod)
     private readonly statusGamePeriodsRepository: Repository<StatusGamePeriod>,
+
     private readonly playerService: PlayerService,
     private readonly teamsService: TeamService,
     private readonly championshipService: ChampionshipService,
@@ -53,28 +54,30 @@ export class SumulaService {
         'teams',
         'championship',
         'championship.category',
-        'PlayerInMatchs',
-        'playersInGame',
+        'playersInMatch',
       ],
     });
   }
 
-  buildStatusTeam(teams: Team[], playerInMatchs: PlayerInMatch[]): team[] {
+  somePointsOrFaults(type: string, playersOfTeam: PlayerInMatch[]) {
+    return playersOfTeam
+      .flatMap((player: PlayerInMatch) => player.statusGamePeriod)
+      .map((status) => status[type])
+      .reduce((currentValue, previousValue) => currentValue + previousValue);
+  }
+
+  async buildStatusTeam(
+    teams: Team[],
+    playersInMatch: PlayerInMatch[],
+  ): Promise<team[]> {
     return teams.map((teamItem) => {
-      const playersOfTeam = playerInMatchs.filter(
+      const playersOfTeam = playersInMatch.filter(
         (playerInMatch) => playerInMatch.teamId == teamItem.id,
       );
-      const points = playersOfTeam
-        .map((player) => player.point)
-        .reduce((currentValue, previousValue) => currentValue + previousValue);
       return {
         name: teamItem.name,
-        points: points,
-        faults: playersOfTeam
-          .map((player) => player.fault)
-          .reduce(
-            (currentValue, previousValue) => currentValue + previousValue,
-          ),
+        points: this.somePointsOrFaults('points', playersOfTeam),
+        faults: this.somePointsOrFaults('faults', playersOfTeam),
       };
     });
   }
@@ -90,10 +93,10 @@ export class SumulaService {
     return eachTeamPoints.reduce((cv, pv) => cv + pv);
   }
 
-  buildStatusPeriod(
+  async buildStatusPeriod(
     periods: number,
     statusGame: StatusGamePeriod[],
-  ): periodInfos[] {
+  ): Promise<periodInfos[]> {
     return Array(periods).map((periodNumber) => {
       const period = statusGame.filter((stats) => stats.period == periodNumber);
       return {
@@ -103,26 +106,49 @@ export class SumulaService {
     });
   }
 
+  async buildPlayersInMatch(
+    playersInMatch: PlayerInMatch[],
+  ): Promise<playersInMatch[]> {
+    return playersInMatch.map((players) => ({
+      ...players,
+      point: players.statusGamePeriod
+        .map((status) => status.point)
+        .reduce((currentValue, previousValue) => currentValue + previousValue),
+      fault: players.statusGamePeriod
+        .map((status) => status.fault)
+        .reduce((currentValue, previousValue) => currentValue + previousValue),
+    }));
+  }
+
   async getGameStatus({ id }: { id: string }): Promise<gameStatus> {
     const sumulaInfos = await this.sumulaRepository.findOne(id, {
       relations: [
         'teams',
         'championship',
         'championship.category',
-        'playerInMatchs',
+        'playersInMatch',
+        'playersInMatch.statusGamePeriod',
         'statusGamePeriod',
       ],
     });
-    return {
-      ...sumulaInfos,
-      teams: this.buildStatusTeam(
-        sumulaInfos.teams,
-        sumulaInfos.playerInMatchs,
-      ),
-      periods: this.buildStatusPeriod(
+
+    const processedsBuilders: Promise<any>[] = [
+      this.buildPlayersInMatch(sumulaInfos.playersInMatch),
+      this.buildStatusTeam(sumulaInfos.teams, sumulaInfos.playersInMatch),
+      this.buildStatusPeriod(
         sumulaInfos.actualPeriod,
         sumulaInfos.statusGamePeriod,
       ),
+    ];
+    const [playersInMatch, teams, periods] = await Promise.all(
+      processedsBuilders,
+    );
+
+    return {
+      ...sumulaInfos,
+      playersInMatch,
+      teams,
+      periods,
     } as gameStatus;
   }
 
@@ -149,62 +175,28 @@ export class SumulaService {
     return await this.sumulaRepository.update(id, payload);
   }
 
-  async addInteraction(
-    interaction: string,
-    payload: any,
-    id: string,
-  ): Promise<any> {
+  async addInteraction(payload: any, id: string): Promise<any> {
     const sumulaInfos = await this.findOne({ id });
-    await this.playerInMatchRepository
-      .increment(
-        {
-          sumulaId: parseInt(id),
-          teamId: payload.teamId,
-          playerId: payload.playerId,
-        },
-        interaction,
-        payload.data[interaction],
-      )
-      .then((response) => response.raw);
     return this.statusGamePeriodsRepository.save({
-      playerInMatchId: payload.id,
-      sumulaId: id,
+      playerInMatchId: payload.playerInMatchId,
+      sumulaId: parseInt(id),
       teamId: payload.teamId,
-      ...payload.data,
+      point: payload.data.point,
+      fault: payload.data.fault,
       period: sumulaInfos.actualPeriod,
     });
   }
 
-  async updatePlayerPointInMatch(
+  async createPlayerStatusInMatch(
     id: string,
-    payload: pointingSumula,
+    payload: pointingSumula | faultingSumula,
   ): Promise<any> {
-    return await this.addInteraction('point', payload, id);
-  }
-  async updatePlayerFaultInMatch(
-    id: string,
-    payload: faultingSumula,
-  ): Promise<any> {
-    return await this.addInteraction('fault', payload, id);
+    return await this.addInteraction(payload, id);
   }
 
   async removePlayerStatus(statusIds: string[]): Promise<any> {
     const status = await this.statusGamePeriodsRepository.findByIds(statusIds);
     return status.map(async (status) => {
-      if (status.point > 0) {
-        await this.playerInMatchRepository.decrement(
-          { id: status.playerInMatchId },
-          'point',
-          status.point,
-        );
-      }
-      if (status.fault > 0) {
-        await this.playerInMatchRepository.decrement(
-          { id: status.playerInMatchId },
-          'fault',
-          status.fault,
-        );
-      }
       return this.statusGamePeriodsRepository.delete({
         id: status.id,
       });

@@ -6,7 +6,7 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
 @Entity()
 export class StatusGamePeriod {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @ManyToOne(() => PlayerInMatch)
   playerInMatch?: PlayerInMatch;
@@ -24,10 +24,10 @@ export class StatusGamePeriod {
   teamId: number;
 
   @Column({ default: 0 })
-  point: number;
+  point?: number;
 
   @Column({ default: 0 })
-  fault: number;
+  fault?: number;
 
   @Column({ default: 1 })
   period: number;

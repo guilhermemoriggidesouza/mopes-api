@@ -30,12 +30,6 @@ export class PlayerInMatch {
   @Column()
   playerId: number;
 
-  @Column({ default: 0 })
-  point: number;
-
-  @Column({ default: 0 })
-  fault: number;
-
   @OneToMany(() => StatusGamePeriod, (SGP) => SGP.playerInMatch)
   statusGamePeriod: StatusGamePeriod[];
 }

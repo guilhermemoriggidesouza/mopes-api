@@ -1,7 +1,7 @@
 import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
 import { SumulaGateway } from './Sumula.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { SumulaController } from './Sumula.controller';
 import { SumulaService } from './Sumula.service';
 import { Sumula } from './entities/Sumula.entity';

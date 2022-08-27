@@ -1,9 +1,10 @@
 type faultingSumula = {
   teamId: number;
-  playerId?: number;
+  playerInMatchId: number;
   data: {
     fault: number;
   };
-  makePerpetue: boolean;
   period: number;
+  playerId?: number;
+  makePerpetue?: boolean;
 };

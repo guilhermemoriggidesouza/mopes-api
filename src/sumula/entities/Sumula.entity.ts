@@ -35,7 +35,7 @@ export class Sumula {
   championshipId?: number;
 
   @OneToMany(() => PlayerInMatch, (GC) => GC.sumula)
-  playerInMatchs?: PlayerInMatch[];
+  playersInMatch?: PlayerInMatch[];
 
   @OneToMany(() => StatusGamePeriod, (GC) => GC.sumula)
   statusGamePeriod?: StatusGamePeriod[];

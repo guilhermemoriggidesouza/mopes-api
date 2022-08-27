@@ -1,6 +1,6 @@
 type pointingSumula = {
   teamId: number;
-  playerId: number;
+  playerInMatchId: number;
   data: {
     point: number;
   };
