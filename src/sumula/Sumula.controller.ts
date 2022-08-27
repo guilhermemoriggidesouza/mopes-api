@@ -37,7 +37,7 @@ export class SumulaController {
   @Get(`${urlBase}/:id`)
   @Roles(Role.Admin)
   async findOne(@Param('id') id: string): Promise<any> {
-    return await this.sumulaService.findOne({ id });
+    return await this.sumulaService.getGameStatus({ id });
   }
 
   @Post(`${urlBase}`)
@@ -55,7 +55,6 @@ export class SumulaController {
     @Param('id') id: string,
     @Body() payload: Sumula,
   ): Promise<any> {
-    console.log('testeeeee2');
     return await this.sumulaService.edit(id, payload as any);
   }
 

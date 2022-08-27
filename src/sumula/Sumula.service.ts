@@ -60,6 +60,7 @@ export class SumulaService {
   }
 
   somePointsOrFaults(type: string, playersOfTeam: PlayerInMatch[]) {
+    if (playersOfTeam.length == 0) return 0;
     return playersOfTeam
       .flatMap((player: PlayerInMatch) => player.statusGamePeriod)
       .map((status) => status[type])
@@ -70,6 +71,7 @@ export class SumulaService {
     teams: Team[],
     playersInMatch: PlayerInMatch[],
   ): Promise<team[]> {
+    if (teams.length == 0) return [];
     return teams.map((teamItem) => {
       const playersOfTeam = playersInMatch.filter(
         (playerInMatch) => playerInMatch.teamId == teamItem.id,
@@ -97,11 +99,18 @@ export class SumulaService {
     periods: number,
     statusGame: StatusGamePeriod[],
   ): Promise<periodInfos[]> {
+    if (statusGame.length == 0) return [];
     return Array(periods).map((periodNumber) => {
       const period = statusGame.filter((stats) => stats.period == periodNumber);
       return {
-        points: period.map((stats) => stats.point).reduce((cv, pv) => cv + pv),
-        faults: period.map((stats) => stats.fault).reduce((cv, pv) => cv + pv),
+        points:
+          period.length == 0
+            ? 0
+            : period.map((stats) => stats.point).reduce((cv, pv) => cv + pv),
+        faults:
+          period.length == 0
+            ? 0
+            : period.map((stats) => stats.fault).reduce((cv, pv) => cv + pv),
       };
     });
   }
@@ -109,6 +118,7 @@ export class SumulaService {
   async buildPlayersInMatch(
     playersInMatch: PlayerInMatch[],
   ): Promise<playersInMatch[]> {
+    if (playersInMatch.length == 0) return [];
     return playersInMatch.map((players) => ({
       ...players,
       point: players.statusGamePeriod
@@ -131,7 +141,6 @@ export class SumulaService {
         'statusGamePeriod',
       ],
     });
-
     const processedsBuilders: Promise<any>[] = [
       this.buildPlayersInMatch(sumulaInfos.playersInMatch),
       this.buildStatusTeam(sumulaInfos.teams, sumulaInfos.playersInMatch),
