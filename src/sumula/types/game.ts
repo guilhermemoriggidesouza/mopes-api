@@ -1,4 +1,4 @@
-type periodInfos = {
+type periods = {
   faults: number;
   points: number;
 };
@@ -10,16 +10,25 @@ type playersInMatch = {
   point: number;
   fault: number;
 };
-
+type players = {
+  id: number;
+  playerInMatchId: number;
+  name: string;
+  infractions?: number;
+  userId?: number;
+  teamId?: number;
+  points: number;
+  faults: number;
+};
 type team = {
   name: string;
   points: number;
   faults: number;
+  players: players[];
 };
 type gameStatus = {
   id: number;
   championshipId: number;
-  playersInMatch: playersInMatch[];
   teams: team[];
-  periods: periodInfos[];
+  periods: periods[];
 };

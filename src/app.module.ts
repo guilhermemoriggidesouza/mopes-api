@@ -1,6 +1,6 @@
 import { SumulaModule } from './sumula/Sumula.module';
 import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
-import { StatusGamePeriod } from './sumula/entities/StatusGamePeriod.entity';
+import { StatusGame } from './sumula/entities/StatusGame.entity';
 import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { CategoryGameModule } from './categoryGame/CategoryGame.module';
 import { Championship } from './championship/entities/Championship.entity';
@@ -38,7 +38,7 @@ import { ChampionshipKeys } from './championship/entities/ChampionshipKeys.entit
         Championship,
         ChampionshipKeys,
         CategoryGame,
-        StatusGamePeriod,
+        StatusGame,
         PlayerInMatch,
       ],
       synchronize: true,

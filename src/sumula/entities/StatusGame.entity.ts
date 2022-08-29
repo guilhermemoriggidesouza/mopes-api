@@ -4,7 +4,7 @@ import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
 
 @Entity()
-export class StatusGamePeriod {
+export class StatusGame {
   @PrimaryGeneratedColumn()
   id?: number;
 

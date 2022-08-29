@@ -1,6 +1,6 @@
 import { PlayerService } from '../player/Player.service';
 import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
-import { StatusGamePeriod } from './entities/StatusGamePeriod.entity';
+import { StatusGame } from './entities/StatusGame.entity';
 import { Team } from 'src/team/Team.entity';
 import {
   Dependencies,
@@ -22,8 +22,8 @@ export class SumulaService {
     private readonly sumulaRepository: Repository<Sumula>,
     @InjectRepository(PlayerInMatch)
     private readonly playerInMatchRepository: Repository<PlayerInMatch>,
-    @InjectRepository(StatusGamePeriod)
-    private readonly statusGamePeriodsRepository: Repository<StatusGamePeriod>,
+    @InjectRepository(StatusGame)
+    private readonly statusGameRepository: Repository<StatusGame>,
 
     private readonly playerService: PlayerService,
     private readonly teamsService: TeamService,
@@ -59,35 +59,49 @@ export class SumulaService {
     });
   }
 
-  somePointsOrFaults(type: string, playersOfTeam: PlayerInMatch[]) {
-    if (playersOfTeam.length == 0) return 0;
-    return playersOfTeam
-      .flatMap((player: PlayerInMatch) => player.statusGamePeriod)
+  somePointsOrFaults(type: string, statusGame: StatusGame[]) {
+    if (statusGame.length == 0) return 0;
+    return statusGame
       .map((status) => status[type])
       .reduce((currentValue, previousValue) => currentValue + previousValue);
   }
-
+  getPlayersTeams(players, playersInMatch): players[] {
+    return players.map((player) => {
+      const playerInMatch = playersInMatch.find(
+        (playerInMatch) => playerInMatch.id == player.id,
+      );
+      return {
+        ...player,
+        playerInMatchId: playerInMatch?.id,
+        faults: this.somePointsOrFaults(
+          'faults',
+          playerInMatch ? [playerInMatch] : [],
+        ),
+        points: this.somePointsOrFaults(
+          'points',
+          playerInMatch ? [playerInMatch] : [],
+        ),
+      };
+    });
+  }
   async buildStatusTeam(
     teams: Team[],
     playersInMatch: PlayerInMatch[],
   ): Promise<team[]> {
     if (teams.length == 0) return [];
-    return teams.map((teamItem) => {
-      const playersOfTeam = playersInMatch.filter(
-        (playerInMatch) => playerInMatch.teamId == teamItem.id,
-      );
-      return {
-        name: teamItem.name,
-        points: this.somePointsOrFaults('points', playersOfTeam),
-        faults: this.somePointsOrFaults('faults', playersOfTeam),
-      };
-    });
+    return Promise.all(
+      teams.map(async (teamItem) => {
+        return {
+          ...teamItem,
+          points: this.somePointsOrFaults('point', teamItem.statusGame || []),
+          faults: this.somePointsOrFaults('fault', teamItem.statusGame || []),
+          players: this.getPlayersTeams(teamItem.players, playersInMatch),
+        };
+      }),
+    );
   }
 
-  getPointsByTeamInPeriod(
-    statusGame: StatusGamePeriod[],
-    teams: Team[],
-  ): number {
+  getPointsByTeamInPeriod(statusGame: StatusGame[], teams: Team[]): number {
     const eachTeamPoints = teams.map((team) => {
       const teamPoint = statusGame.find((stats) => stats.teamId == team.id);
       return teamPoint.point;
@@ -97,8 +111,8 @@ export class SumulaService {
 
   async buildStatusPeriod(
     periods: number,
-    statusGame: StatusGamePeriod[],
-  ): Promise<periodInfos[]> {
+    statusGame: StatusGame[],
+  ): Promise<periods[]> {
     if (statusGame.length == 0) return [];
     return Array(periods).map((periodNumber) => {
       const period = statusGame.filter((stats) => stats.period == periodNumber);
@@ -115,47 +129,26 @@ export class SumulaService {
     });
   }
 
-  async buildPlayersInMatch(
-    playersInMatch: PlayerInMatch[],
-  ): Promise<playersInMatch[]> {
-    if (playersInMatch.length == 0) return [];
-    return playersInMatch.map((players) => ({
-      ...players,
-      point: players.statusGamePeriod
-        .map((status) => status.point)
-        .reduce((currentValue, previousValue) => currentValue + previousValue),
-      fault: players.statusGamePeriod
-        .map((status) => status.fault)
-        .reduce((currentValue, previousValue) => currentValue + previousValue),
-    }));
-  }
-
   async getGameStatus({ id }: { id: string }): Promise<gameStatus> {
     const sumulaInfos = await this.sumulaRepository.findOne(id, {
       relations: [
         'teams',
+        'teams.players',
         'championship',
         'championship.category',
         'playersInMatch',
-        'playersInMatch.statusGamePeriod',
-        'statusGamePeriod',
+        'playersInMatch.statusGame',
+        'statusGame',
       ],
     });
     const processedsBuilders: Promise<any>[] = [
-      this.buildPlayersInMatch(sumulaInfos.playersInMatch),
       this.buildStatusTeam(sumulaInfos.teams, sumulaInfos.playersInMatch),
-      this.buildStatusPeriod(
-        sumulaInfos.actualPeriod,
-        sumulaInfos.statusGamePeriod,
-      ),
+      this.buildStatusPeriod(sumulaInfos.actualPeriod, sumulaInfos.statusGame),
     ];
-    const [playersInMatch, teams, periods] = await Promise.all(
-      processedsBuilders,
-    );
+    const [teams, periods] = await Promise.all(processedsBuilders);
 
     return {
       ...sumulaInfos,
-      playersInMatch,
       teams,
       periods,
     } as gameStatus;
@@ -186,7 +179,7 @@ export class SumulaService {
 
   async addInteraction(payload: any, id: string): Promise<any> {
     const sumulaInfos = await this.findOne({ id });
-    return this.statusGamePeriodsRepository.save({
+    return this.statusGameRepository.save({
       playerInMatchId: payload.playerInMatchId,
       sumulaId: parseInt(id),
       teamId: payload.teamId,
@@ -204,9 +197,9 @@ export class SumulaService {
   }
 
   async removePlayerStatus(statusIds: string[]): Promise<any> {
-    const status = await this.statusGamePeriodsRepository.findByIds(statusIds);
+    const status = await this.statusGameRepository.findByIds(statusIds);
     return status.map(async (status) => {
-      return this.statusGamePeriodsRepository.delete({
+      return this.statusGameRepository.delete({
         id: status.id,
       });
     });

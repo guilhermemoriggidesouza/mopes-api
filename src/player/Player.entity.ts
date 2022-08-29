@@ -1,3 +1,4 @@
+import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
 import { Team } from 'src/team/Team.entity';
 import { User } from 'src/user/User.entity';
 import {
@@ -8,6 +9,7 @@ import {
   JoinColumn,
   ManyToOne,
   RelationId,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -21,7 +23,7 @@ export class Player {
   @Column({ nullable: true, default: 0 })
   infractions?: number;
 
-  @OneToOne(() => User, (user)=> user.player)
+  @OneToOne(() => User, (user) => user.player)
   @JoinColumn()
   user?: User;
 

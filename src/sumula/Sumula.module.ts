@@ -6,13 +6,13 @@ import { SumulaController } from './Sumula.controller';
 import { SumulaService } from './Sumula.service';
 import { Sumula } from './entities/Sumula.entity';
 import { PlayerModule } from 'src/player/Player.module';
-import { StatusGamePeriod } from './entities/StatusGamePeriod.entity';
+import { StatusGame } from './entities/StatusGame.entity';
 import { TeamModule } from 'src/team/Team.module';
 import { ChampionshipModule } from 'src/championship/Championship.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Sumula, PlayerInMatch, StatusGamePeriod]),
+    TypeOrmModule.forFeature([Sumula, PlayerInMatch, StatusGame]),
     PlayerModule,
     TeamModule,
     ChampionshipModule,
