@@ -39,12 +39,8 @@ export class Team {
   @JoinTable()
   championships: Championship[];
 
-  @OneToOne(() => User, (user) => user.team)
-  @JoinColumn()
-  coach: User;
-
-  @Column({ nullable: true })
-  coachId: number;
+  @OneToMany(() => User, (user) => user.team)
+  coachs: User[];
 
   @Column({ default: false })
   payedIntegration: boolean;

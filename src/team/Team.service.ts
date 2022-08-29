@@ -27,7 +27,7 @@ export class TeamService {
   async findOne({ id, where }: { id?: string; where?: any }): Promise<Team> {
     return this.teamRepository.findOne(id, {
       where,
-      relations: ['players', 'players.user', 'coach'],
+      relations: ['players', 'players.user', 'coachs'],
     });
   }
 
@@ -43,22 +43,14 @@ export class TeamService {
       teamId: parseInt(id),
       orgId,
     });
-    payload.coachId = await this.updateOrCreate(payload.coach, parseInt(id));
+    await this.saveCoachs({
+      coachs: payload.coachs,
+      teamId: parseInt(id),
+      orgId,
+    });
     delete payload.players;
-    delete payload.coach;
+    delete payload.coachs;
     return await this.teamRepository.update(id, payload);
-  }
-
-  async updateOrCreate(user: User, id: number): Promise<number> {
-    if (!user.id) {
-      user.teamId = id;
-      user.role = 'coach';
-      const createdUser = await this.userService.create(user);
-      user.id = createdUser.id;
-    } else {
-      await this.userService.edit(user.id.toString(), user);
-    }
-    return user.id;
   }
 
   async savePlayers({
@@ -76,6 +68,26 @@ export class TeamService {
         teamId,
       }));
       await this.playerService.createMany(players, orgId, teamId);
+    }
+  }
+
+  async saveCoachs({
+    coachs,
+    teamId,
+    orgId,
+  }: {
+    coachs: User[];
+    teamId: number;
+    orgId: number;
+  }) {
+    if (coachs && teamId) {
+      coachs = coachs.map((coach) => ({
+        ...coach,
+        teamId,
+        orgId,
+        role: 'coach',
+      }));
+      await this.userService.createMany(coachs, teamId);
     }
   }
 }

@@ -43,7 +43,7 @@ export class User {
   @OneToMany(() => Championship, (champ) => champ.owner)
   championshipsOwner?: Championship[];
 
-  @OneToOne(() => Team, (team) => team.coach)
+  @ManyToOne(() => Team, (team) => team.coachs)
   team?: Team;
   @Column({ nullable: true })
   teamId?: number;

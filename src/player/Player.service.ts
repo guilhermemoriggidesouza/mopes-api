@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
 import { UserService } from 'src/user/User.service';
-import { In, IsNull, Not, Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { Player } from './Player.entity';
 
 @Injectable()
