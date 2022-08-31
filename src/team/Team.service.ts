@@ -33,8 +33,8 @@ export class TeamService {
 
   async remove(id: string): Promise<any> {
     await this.playerService.remove({ where: { teamId: id } });
-    await this.teamRepository.delete(id);
-    return await this.userService.remove({ where: { teamId: id } });
+    await this.userService.remove({ where: { teamId: id } });
+    return await this.teamRepository.delete(id);
   }
 
   async edit(id: string, payload: any, orgId: number): Promise<any> {

@@ -26,6 +26,15 @@ export class User {
   @Column({ unique: true })
   login: string;
 
+  @Column({ default: '' })
+  rg: string;
+
+  @Column({ unique: true, nullable: true })
+  ra?: string;
+
+  @Column({ default: '' })
+  class: string;
+
   @Column()
   password: string;
 

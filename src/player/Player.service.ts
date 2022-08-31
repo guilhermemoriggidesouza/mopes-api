@@ -33,6 +33,10 @@ export class PlayerService {
       const user = await this.userService.create({
         name: player.name,
         login: player.login,
+        ra: player.ra,
+        rg: player.rg,
+        birthday: player.birthday,
+        class: player.class,
         password: player.password,
         orgId,
         teamId: player.teamId,
