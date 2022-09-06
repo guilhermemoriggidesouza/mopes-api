@@ -42,6 +42,9 @@ export class Team {
   @OneToMany(() => User, (user) => user.team)
   coachs: User[];
 
+  @Column({ default: '' })
+  city: string;
+
   @Column({ default: false })
   payedIntegration: boolean;
 
