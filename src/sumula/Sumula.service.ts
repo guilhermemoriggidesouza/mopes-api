@@ -44,6 +44,11 @@ export class SumulaService {
   async findAll(): Promise<Sumula[]> {
     return this.sumulaRepository.find({
       relations: ['teams', 'championship', 'championship.category'],
+      where: {
+        championship: {
+          started: true,
+        },
+      },
     });
   }
 
@@ -166,10 +171,10 @@ export class SumulaService {
         id: In(ids),
       });
     }
-    this.championshipService.syncTeamChampionship({
+    await this.sumulaRepository.save(sumula);
+    await this.championshipService.syncTeamChampionship({
       championshipId: sumula.championshipId,
     });
-    await this.sumulaRepository.save(sumula);
     return sumula;
   }
 

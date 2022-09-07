@@ -195,7 +195,7 @@ export class ChampionshipService {
         return champKey.sumulas.flatMap((sumula) => sumula.teams);
       }),
     ]);
-
+    console.log(championship.teams);
     return this.championshipRepository.save({ ...championship });
   }
 }
