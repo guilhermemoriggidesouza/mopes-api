@@ -23,12 +23,8 @@ import { ChampionshipKeys } from './championship/entities/ChampionshipKeys.entit
 @Module({
   imports: [
     TypeOrmModule.forRoot({
+      url: config.db_url,
       type: 'postgres',
-      host: config.db_host,
-      port: parseInt(config.db_port),
-      username: config.db_username,
-      password: config.db_password,
-      database: config.db_database,
       entities: [
         User,
         Org,

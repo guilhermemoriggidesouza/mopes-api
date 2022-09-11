@@ -8,4 +8,5 @@ export default {
   db_password: process.env.PASSWORD_DB_MOPE,
   db_database: process.env.DATABASE_DB_MOPE,
   db_port: process.env.PORT_DB_MOPE,
+  db_url: process.env.DATABASE_URL,
 };
