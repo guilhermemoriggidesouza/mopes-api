@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ cors: false })
 export class SumulaGateway {
   constructor(private readonly sumulaService: SumulaService) {}
 
