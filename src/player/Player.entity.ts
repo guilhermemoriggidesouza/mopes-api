@@ -35,4 +35,9 @@ export class Player {
 
   @ManyToOne(() => Team, (team) => team.players)
   team?: Team;
+
+  @OneToOne(() => PlayerInMatch, (PIM) => PIM.player)
+  playerInMatch?: PlayerInMatch;
+  @Column({ nullable: true })
+  playerInMatchId?: number;
 }

@@ -12,8 +12,8 @@ type playersInMatch = {
 };
 type players = {
   id: number;
-  playerInMatchId: number;
   name: string;
+  playerInMatchId?: number;
   infractions?: number;
   userId?: number;
   teamId?: number;

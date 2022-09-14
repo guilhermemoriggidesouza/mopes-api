@@ -8,6 +8,8 @@ import {
   ManyToOne,
   Column,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -25,7 +27,8 @@ export class PlayerInMatch {
   @Column()
   teamId: number;
 
-  @ManyToOne(() => Player)
+  @OneToOne(() => Player)
+  @JoinColumn()
   player: Player;
   @Column()
   playerId: number;

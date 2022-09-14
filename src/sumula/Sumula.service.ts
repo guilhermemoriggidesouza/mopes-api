@@ -70,29 +70,27 @@ export class SumulaService {
       .map((status) => status[type])
       .reduce((currentValue, previousValue) => currentValue + previousValue);
   }
-  getPlayersTeams(players, playersInMatch): players[] {
+
+  getPlayersTeams(players): players[] {
     return players.map((player) => {
-      const playerInMatch = playersInMatch.find(
-        (playerInMatch) => playerInMatch.id == player.id,
-      );
       return {
         ...player,
-        playerInMatchId: playerInMatch?.id,
         faults: this.somePointsOrFaults(
           'faults',
-          playerInMatch ? [playerInMatch] : [],
+          player.playerInMatch?.statusGame
+            ? player.playerInMatch.statusGame
+            : [],
         ),
         points: this.somePointsOrFaults(
           'points',
-          playerInMatch ? [playerInMatch] : [],
+          player.playerInMatch?.statusGame
+            ? player.playerInMatch.statusGame
+            : [],
         ),
       };
     });
   }
-  async buildStatusTeam(
-    teams: Team[],
-    playersInMatch: PlayerInMatch[],
-  ): Promise<team[]> {
+  async buildStatusTeam(teams: Team[]): Promise<team[]> {
     if (teams.length == 0) return [];
     return Promise.all(
       teams.map(async (teamItem) => {
@@ -100,7 +98,7 @@ export class SumulaService {
           ...teamItem,
           points: this.somePointsOrFaults('point', teamItem.statusGame || []),
           faults: this.somePointsOrFaults('fault', teamItem.statusGame || []),
-          players: this.getPlayersTeams(teamItem.players, playersInMatch),
+          players: this.getPlayersTeams(teamItem.players),
         };
       }),
     );
@@ -139,15 +137,17 @@ export class SumulaService {
       relations: [
         'teams',
         'teams.players',
+        'teams.players.playerInMatch',
+        'teams.players.playerInMatch.statusGame',
+        'teams.statusGame',
         'championship',
-        'championship.category',
         'playersInMatch',
-        'playersInMatch.statusGame',
+        'championship.category',
         'statusGame',
       ],
     });
     const processedsBuilders: Promise<any>[] = [
-      this.buildStatusTeam(sumulaInfos.teams, sumulaInfos.playersInMatch),
+      this.buildStatusTeam(sumulaInfos.teams),
       this.buildStatusPeriod(sumulaInfos.actualPeriod, sumulaInfos.statusGame),
     ];
     const [teams, periods] = await Promise.all(processedsBuilders);
@@ -222,13 +222,23 @@ export class SumulaService {
     } = await this.sumulaRepository.findOne(id, {
       relations: ['championship', 'championship.category'],
     });
-    const player = await this.playerService.findOne({ id: payload.playerId });
-    if (player.infractions == category.maxFaultsPerPlayer) {
+    const playerInMatch = await this.playerInMatchRepository.findOne({
+      where: { playerId: payload.playerId },
+    });
+    console.log(playerInMatch, category.maxInfractionPerPlayer);
+    if (playerInMatch) {
       throw new BadRequestException('Error player cannot be insert game');
     }
+
+    const player = await this.playerService.findOne({ id: payload.playerId });
+    if (player.infractions >= category.maxInfractionPerPlayer) {
+      throw new BadRequestException('Error player cannot be insert game');
+    }
+
     return this.playerInMatchRepository.save({
       sumulaId: parseInt(id),
-      ...payload,
+      teamId: player.teamId,
+      playerId: player.id,
     });
   }
 }

@@ -18,7 +18,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Sumula } from './entities/Sumula.entity';
 import { SumulaService } from './Sumula.service';
-const urlBase: string = '/sumula';
+const urlBase = '/sumula';
 
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
