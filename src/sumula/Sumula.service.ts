@@ -76,13 +76,13 @@ export class SumulaService {
       return {
         ...player,
         faults: this.somePointsOrFaults(
-          'faults',
+          'fault',
           player.playerInMatch?.statusGame
             ? player.playerInMatch.statusGame
             : [],
         ),
         points: this.somePointsOrFaults(
-          'points',
+          'point',
           player.playerInMatch?.statusGame
             ? player.playerInMatch.statusGame
             : [],
@@ -144,6 +144,9 @@ export class SumulaService {
         'playersInMatch',
         'championship.category',
         'statusGame',
+        'statusGame.team',
+        'statusGame.playerInMatch',
+        'statusGame.playerInMatch.player',
       ],
     });
     const processedsBuilders: Promise<any>[] = [
@@ -201,13 +204,8 @@ export class SumulaService {
     return await this.addInteraction(payload, id);
   }
 
-  async removePlayerStatus(statusIds: string[]): Promise<any> {
-    const status = await this.statusGameRepository.findByIds(statusIds);
-    return status.map(async (status) => {
-      return this.statusGameRepository.delete({
-        id: status.id,
-      });
-    });
+  async removePlayerStatus(statusId: string): Promise<any> {
+    return await this.statusGameRepository.delete(parseInt(statusId));
   }
 
   async findAllPlayerInMatch(id: string): Promise<PlayerInMatch[]> {

@@ -40,6 +40,6 @@ export class Sumula {
   @OneToMany(() => StatusGame, (GC) => GC.sumula)
   statusGame?: StatusGame[];
 
-  @Column()
+  @Column({ default: 1 })
   actualPeriod?: number;
 }

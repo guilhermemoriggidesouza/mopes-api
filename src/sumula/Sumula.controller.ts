@@ -101,10 +101,13 @@ export class SumulaController {
     return interaction;
   }
 
-  @Delete(`${urlBase}/player-in-match`)
+  @Delete(`${urlBase}/:id/status-game/:statusId`)
   @Roles(Role.Admin)
-  async removeInteration(@Body() payload: any): Promise<any> {
-    return await this.sumulaService.removePlayerStatus(payload.statusIds);
+  async removeStatus(
+    @Param('id') id: string,
+    @Param('statusId') statusId: string,
+  ): Promise<any> {
+    return await this.sumulaService.removePlayerStatus(statusId);
   }
 
   @Get(`${urlBase}/:id/player-in-match`)
