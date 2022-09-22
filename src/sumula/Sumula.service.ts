@@ -117,7 +117,9 @@ export class SumulaService {
     statusGame: StatusGame[],
   ): Promise<periods[]> {
     if (statusGame.length == 0) return [];
-    return Array(periods).map((periodNumber) => {
+    console.log(periods);
+    return this.createArray(periods).map((periodNumber) => {
+      console.log(periodNumber);
       const period = statusGame.filter((stats) => stats.period == periodNumber);
       return {
         points:
@@ -130,6 +132,10 @@ export class SumulaService {
             : period.map((stats) => stats.fault).reduce((cv, pv) => cv + pv),
       };
     });
+  }
+
+  createArray(number) {
+    return Array.from({ length: number }, (_, i) => i + 1);
   }
 
   async getGameStatus({ id }: { id: string }): Promise<gameStatus> {
