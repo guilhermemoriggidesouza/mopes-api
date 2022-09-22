@@ -21,8 +21,11 @@ export class CategoryGame {
   @Column()
   maxFaultsPerPlayer: number;
 
-  @Column({ default: 0 })
+  @Column({ default: 5 })
   maxFaultsPerTeam: number;
+
+  @Column({ default: 2 })
+  maxInfractionPerPlayer: number;
 
   @OneToMany(() => Championship, (champ) => champ.category)
   championships: Championship[];

@@ -70,29 +70,27 @@ export class SumulaService {
       .map((status) => status[type])
       .reduce((currentValue, previousValue) => currentValue + previousValue);
   }
-  getPlayersTeams(players, playersInMatch): players[] {
+
+  getPlayersTeams(players): players[] {
     return players.map((player) => {
-      const playerInMatch = playersInMatch.find(
-        (playerInMatch) => playerInMatch.id == player.id,
-      );
       return {
         ...player,
-        playerInMatchId: playerInMatch?.id,
         faults: this.somePointsOrFaults(
-          'faults',
-          playerInMatch ? [playerInMatch] : [],
+          'fault',
+          player.playerInMatch?.statusGame
+            ? player.playerInMatch.statusGame
+            : [],
         ),
         points: this.somePointsOrFaults(
-          'points',
-          playerInMatch ? [playerInMatch] : [],
+          'point',
+          player.playerInMatch?.statusGame
+            ? player.playerInMatch.statusGame
+            : [],
         ),
       };
     });
   }
-  async buildStatusTeam(
-    teams: Team[],
-    playersInMatch: PlayerInMatch[],
-  ): Promise<team[]> {
+  async buildStatusTeam(teams: Team[]): Promise<team[]> {
     if (teams.length == 0) return [];
     return Promise.all(
       teams.map(async (teamItem) => {
@@ -100,7 +98,7 @@ export class SumulaService {
           ...teamItem,
           points: this.somePointsOrFaults('point', teamItem.statusGame || []),
           faults: this.somePointsOrFaults('fault', teamItem.statusGame || []),
-          players: this.getPlayersTeams(teamItem.players, playersInMatch),
+          players: this.getPlayersTeams(teamItem.players),
         };
       }),
     );
@@ -119,7 +117,9 @@ export class SumulaService {
     statusGame: StatusGame[],
   ): Promise<periods[]> {
     if (statusGame.length == 0) return [];
-    return Array(periods).map((periodNumber) => {
+    console.log(periods);
+    return this.createArray(periods).map((periodNumber) => {
+      console.log(periodNumber);
       const period = statusGame.filter((stats) => stats.period == periodNumber);
       return {
         points:
@@ -134,20 +134,29 @@ export class SumulaService {
     });
   }
 
+  createArray(number) {
+    return Array.from({ length: number }, (_, i) => i + 1);
+  }
+
   async getGameStatus({ id }: { id: string }): Promise<gameStatus> {
     const sumulaInfos = await this.sumulaRepository.findOne(id, {
       relations: [
         'teams',
         'teams.players',
+        'teams.players.playerInMatch',
+        'teams.players.playerInMatch.statusGame',
+        'teams.statusGame',
         'championship',
-        'championship.category',
         'playersInMatch',
-        'playersInMatch.statusGame',
+        'championship.category',
         'statusGame',
+        'statusGame.team',
+        'statusGame.playerInMatch',
+        'statusGame.playerInMatch.player',
       ],
     });
     const processedsBuilders: Promise<any>[] = [
-      this.buildStatusTeam(sumulaInfos.teams, sumulaInfos.playersInMatch),
+      this.buildStatusTeam(sumulaInfos.teams),
       this.buildStatusPeriod(sumulaInfos.actualPeriod, sumulaInfos.statusGame),
     ];
     const [teams, periods] = await Promise.all(processedsBuilders);
@@ -201,13 +210,8 @@ export class SumulaService {
     return await this.addInteraction(payload, id);
   }
 
-  async removePlayerStatus(statusIds: string[]): Promise<any> {
-    const status = await this.statusGameRepository.findByIds(statusIds);
-    return status.map(async (status) => {
-      return this.statusGameRepository.delete({
-        id: status.id,
-      });
-    });
+  async removePlayerStatus(statusId: string): Promise<any> {
+    return await this.statusGameRepository.delete(parseInt(statusId));
   }
 
   async findAllPlayerInMatch(id: string): Promise<PlayerInMatch[]> {
@@ -222,13 +226,23 @@ export class SumulaService {
     } = await this.sumulaRepository.findOne(id, {
       relations: ['championship', 'championship.category'],
     });
-    const player = await this.playerService.findOne({ id: payload.playerId });
-    if (player.infractions == category.maxFaultsPerPlayer) {
+    const playerInMatch = await this.playerInMatchRepository.findOne({
+      where: { playerId: payload.playerId },
+    });
+    console.log(playerInMatch, category.maxInfractionPerPlayer);
+    if (playerInMatch) {
       throw new BadRequestException('Error player cannot be insert game');
     }
+
+    const player = await this.playerService.findOne({ id: payload.playerId });
+    if (player.infractions >= category.maxInfractionPerPlayer) {
+      throw new BadRequestException('Error player cannot be insert game');
+    }
+
     return this.playerInMatchRepository.save({
       sumulaId: parseInt(id),
-      ...payload,
+      teamId: player.teamId,
+      playerId: player.id,
     });
   }
 }

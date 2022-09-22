@@ -53,14 +53,12 @@ export class ChampionshipService {
     const sumulasToCreate: any = championshipKeys.map((championshipKey) =>
       this.createArray(gamePerKeys).map(() => ({
         championshipId,
-        actualPeriod: 0,
         championshipKeysId: championshipKey.id,
       })),
     );
     sumulasToCreate.push(
       this.createArray(blankGames).map(() => ({
         championshipId,
-        actualPeriod: 0,
       })),
     );
     return this.sumulasService.createMany(sumulasToCreate.flat());
@@ -195,7 +193,6 @@ export class ChampionshipService {
         return champKey.sumulas.flatMap((sumula) => sumula.teams);
       }),
     ]);
-    console.log(championship.teams);
     return this.championshipRepository.save({ ...championship });
   }
 }

@@ -8,6 +8,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -38,7 +39,7 @@ export class UserController {
     return await this.userService.create(payload);
   }
 
-  @Post(`${urlBase}/:id`)
+  @Put(`${urlBase}/:id`)
   @Roles(Role.Player)
   @Roles(Role.Admin)
   async editUsers(

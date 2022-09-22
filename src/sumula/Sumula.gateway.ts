@@ -19,6 +19,6 @@ export class SumulaGateway {
     const gameStatus = await this.sumulaService.getGameStatus({
       id: data.sumulaId,
     });
-    this.server.emit('sync:' + data.sumulaId, gameStatus);
+    this.server.emit(`sync:${data.sumulaId}`, gameStatus);
   }
 }

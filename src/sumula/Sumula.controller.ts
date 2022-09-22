@@ -18,7 +18,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Sumula } from './entities/Sumula.entity';
 import { SumulaService } from './Sumula.service';
-const urlBase: string = '/sumula';
+const urlBase = '/sumula';
 
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -101,10 +101,13 @@ export class SumulaController {
     return interaction;
   }
 
-  @Delete(`${urlBase}/player-in-match`)
+  @Delete(`${urlBase}/:id/status-game/:statusId`)
   @Roles(Role.Admin)
-  async removeInteration(@Body() payload: any): Promise<any> {
-    return await this.sumulaService.removePlayerStatus(payload.statusIds);
+  async removeStatus(
+    @Param('id') id: string,
+    @Param('statusId') statusId: string,
+  ): Promise<any> {
+    return await this.sumulaService.removePlayerStatus(statusId);
   }
 
   @Get(`${urlBase}/:id/player-in-match`)
