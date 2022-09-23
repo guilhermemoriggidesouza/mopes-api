@@ -18,6 +18,9 @@ import {
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Sumula } from './entities/Sumula.entity';
 import { SumulaService } from './Sumula.service';
+import { Server } from 'socket.io';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { SumulaGateway } from './Sumula.gateway';
 const urlBase = '/sumula';
 
 @Controller()
@@ -26,6 +29,7 @@ export class SumulaController {
   constructor(
     private readonly sumulaService: SumulaService,
     private readonly playerService: PlayerService,
+    private readonly sumulaGateway: SumulaGateway,
   ) {}
 
   @Get(`${urlBase}`)
@@ -99,6 +103,7 @@ export class SumulaController {
         parseInt(id),
       );
     }
+    this.sumulaService.sendMessage(this.sumulaGateway.server, payload, id);
     return interaction;
   }
 

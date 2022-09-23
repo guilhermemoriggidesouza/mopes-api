@@ -18,6 +18,7 @@ import { Connection, In, Repository } from 'typeorm';
 import { Sumula } from './entities/Sumula.entity';
 import { TeamService } from 'src/team/Team.service';
 import { ChampionshipService } from 'src/championship/Championship.service';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class SumulaService {
@@ -69,13 +70,13 @@ export class SumulaService {
     });
   }
 
-  async buildStatusTeam(sumulaId: number): Promise<team[]> {
+  async buildStatusTeam(sumulaId, teamsParam): Promise<team[]> {
     const teams: team[] = await this.connection.query(`
-      SELECT sg."teamId", t.name, SUM(sg.point) AS points, SUM(sg.fault) AS faults 
-      FROM status_game sg 
-      LEFT JOIN team t ON t.id = sg."teamId"
-      WHERE sg."sumulaId" = ${sumulaId} 
-      GROUP BY sg."teamId", t.name
+      SELECT t.id, t.name, SUM(sg.point) AS points, SUM(sg.fault) AS faults 
+      FROM team t 
+      LEFT JOIN status_game sg ON t.id = sg."teamId" and sg."sumulaId" = ${sumulaId}
+      WHERE t.id in (${teamsParam.map((team) => team.id)})
+      GROUP BY t.id, t.name
     `);
     return teams || [];
   }
@@ -84,14 +85,12 @@ export class SumulaService {
     sumulaId: number,
   ): Promise<players[]> {
     const players = await this.connection.query(`
-      SELECT pl.id, pl."userId", pl.infractions, pl."teamId", pl.name, pl."playerInMatchId", pin."sumulaId", coalesce(SUM(sg.point),0) as points, coalesce(SUM(sg.fault), 0) as faults
+      SELECT pl.id, pl."userId", pl.infractions, pl."teamId", pl.name, pin.id as "playerInMatchId", pin."sumulaId", coalesce(SUM(sg.point),0) as points, coalesce(SUM(sg.fault), 0) as faults
       FROM player pl 
-      LEFT JOIN player_in_match pin ON pin.id = pl."playerInMatchId"
+      LEFT JOIN player_in_match pin ON pl.id = pin."playerId" AND pin."sumulaId" = ${sumulaId} 
       LEFT JOIN status_game sg ON pin.id = sg."playerInMatchId"
-      WHERE pl."teamId" in (${teams.join(
-        ',',
-      )}) and (pin."sumulaId" = ${sumulaId} or pin."sumulaId" is NULL)
-      group by pl.name, pl."playerInMatchId", pin."sumulaId", pl.id, pl."userId", pl.infractions, pl."teamId"
+      WHERE pl."teamId" in (${teams.join(',')})      
+      group by pl.name, pin.id, pin."sumulaId", pl.id, pl."userId", pl.infractions, pl."teamId"
     `);
     return players;
   }
@@ -103,6 +102,52 @@ export class SumulaService {
     return periods || [];
   }
 
+  async sendMessage(sender: Server, payload, sumulaId) {
+    const messages = [];
+    const sumula = await this.sumulaRepository.findOne(sumulaId, {
+      relations: ['championship', 'championship.category'],
+    });
+    const [[statusPerTeam], [statusPerPlayer]] = await Promise.all([
+      this.statusGameRepository.query(`
+        SELECT coalesce(SUM(sg.fault), 0) as faults, t.name
+        FROM status_game sg
+        LEFT JOIN team t ON t.id = sg."teamId"
+        WHERE sg."sumulaId" = ${sumulaId} AND sg.period = ${payload.period} and sg."teamId" = ${payload.teamId}
+        GROUP BY t.name
+      `),
+      this.statusGameRepository.query(`
+        SELECT coalesce(SUM(sg.fault), 0) as faults, p.name
+        FROM status_game sg
+        LEFT JOIN player_in_match pin ON pin.id = sg."playerInMatchId"
+        LEFT JOIN player p ON p.id = pin."playerId"
+        WHERE sg."sumulaId" = ${sumulaId} AND sg.period = ${payload.period} and sg."playerInMatchId" = ${payload.playerInMatchId}
+        GROUP BY p.name
+      `),
+    ]);
+
+    if (
+      statusPerTeam.faults % sumula.championship.category.maxFaultsPerTeam ==
+      0
+    ) {
+      messages.push({
+        resp: statusPerTeam.name,
+        type: 'maxFaultsPerTeam',
+      });
+    }
+
+    if (
+      statusPerPlayer.faults %
+        sumula.championship.category.maxFaultsPerPlayer ==
+      0
+    ) {
+      messages.push({
+        resp: statusPerPlayer.name,
+        type: 'maxFaultsPerPlayer',
+      });
+    }
+    sender.emit(`alert:${sumulaId}`, messages);
+  }
+
   createArray(number) {
     return Array.from({ length: number }, (_, i) => i + 1);
   }
@@ -110,6 +155,7 @@ export class SumulaService {
   async getGameStatus({ id }: { id: string }): Promise<gameStatus> {
     const sumulaInfos = await this.sumulaRepository.findOne(id, {
       relations: [
+        'teams',
         'championship',
         'championship.category',
         'statusGame',
@@ -119,12 +165,12 @@ export class SumulaService {
       ],
     });
     const processedsBuilders: Promise<any>[] = [
-      this.buildStatusTeam(parseInt(id)),
+      this.buildStatusTeam(parseInt(id), sumulaInfos.teams),
       this.buildStatusPeriod(parseInt(id)),
     ];
     const [teams, periods] = await Promise.all(processedsBuilders);
     const players = await this.buildStatusPlayer(
-      teams.map((team) => team.teamId),
+      teams.map((team) => team.id),
       parseInt(id),
     );
     return {
@@ -194,24 +240,19 @@ export class SumulaService {
       relations: ['championship', 'championship.category'],
     });
     const playerInMatch = await this.playerInMatchRepository.findOne({
-      where: { playerId: payload.playerId },
+      where: { playerId: payload.playerId, sumulaId: id },
     });
-    console.log(playerInMatch, category.maxInfractionPerPlayer);
     if (playerInMatch) {
       throw new BadRequestException('Error player cannot be insert game');
     }
-
     const player = await this.playerService.findOne({ id: payload.playerId });
     if (player.infractions >= category.maxInfractionPerPlayer) {
       throw new BadRequestException('Error player cannot be insert game');
     }
-    const playerInMatchSaved = await this.playerInMatchRepository.save({
+    await this.playerInMatchRepository.save({
       sumulaId: parseInt(id),
       teamId: player.teamId,
       playerId: player.id,
-    });
-    return this.playerService.edit(player.id.toString(), {
-      playerInMatchId: playerInMatchSaved.id,
     });
   }
 }

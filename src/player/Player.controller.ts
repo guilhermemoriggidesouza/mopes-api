@@ -36,17 +36,17 @@ export class PlayerController {
   }
 
   @Put(`${urlBase}/:id`)
-  @Roles(Role.Player, Role.Coach)
+  @Roles(Role.Player, Role.Coach, Role.Admin)
   async editPlayers(
     @Param('id') id: string,
     @Body() payload: Player,
-  ): Promise<object> {
-    return await this.playerService.edit(id, payload as object);
+  ): Promise<any> {
+    return await this.playerService.edit(id, payload as any);
   }
 
   @Delete(`${urlBase}/:id`)
   @Roles(Role.Coach, Role.Admin)
-  async removePlayer(@Param('id') id: string): Promise<object> {
+  async removePlayer(@Param('id') id: string): Promise<any> {
     return await this.playerService.remove({ id });
   }
 }

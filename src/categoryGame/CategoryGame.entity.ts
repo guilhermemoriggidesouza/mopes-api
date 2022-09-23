@@ -18,7 +18,7 @@ export class CategoryGame {
   @Column()
   maxPlayersPerGame: number;
 
-  @Column()
+  @Column({ default: 5 })
   maxFaultsPerPlayer: number;
 
   @Column({ default: 5 })

@@ -10,6 +10,7 @@ import {
   JoinColumn,
   ManyToOne,
   RelationId,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -42,8 +43,6 @@ export class Player {
   @Column({ nullable: true })
   lastSumulaInfractionId?: number;
 
-  @OneToOne(() => PlayerInMatch, (PIM) => PIM.player)
-  playerInMatch?: PlayerInMatch;
-  @Column({ nullable: true })
-  playerInMatchId?: number;
+  @OneToMany(() => PlayerInMatch, (PIM) => PIM.player)
+  playerInMatch?: PlayerInMatch[];
 }
