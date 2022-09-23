@@ -1,4 +1,5 @@
 import { PlayerInMatch } from 'src/sumula/entities/PlayerInMatch.entity';
+import { Sumula } from 'src/sumula/entities/Sumula.entity';
 import { Team } from 'src/team/Team.entity';
 import { User } from 'src/user/User.entity';
 import {
@@ -35,6 +36,11 @@ export class Player {
 
   @ManyToOne(() => Team, (team) => team.players)
   team?: Team;
+
+  @ManyToOne(() => Sumula)
+  lastSumulaInfraction?: Sumula;
+  @Column({ nullable: true })
+  lastSumulaInfractionId?: number;
 
   @OneToOne(() => PlayerInMatch, (PIM) => PIM.player)
   playerInMatch?: PlayerInMatch;

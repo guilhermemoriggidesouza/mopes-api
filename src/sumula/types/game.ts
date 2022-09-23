@@ -24,11 +24,11 @@ type team = {
   name: string;
   points: number;
   faults: number;
-  players: players[];
 };
 type gameStatus = {
   id: number;
   championshipId: number;
   teams: team[];
+  players: players[];
   periods: periods[];
 };

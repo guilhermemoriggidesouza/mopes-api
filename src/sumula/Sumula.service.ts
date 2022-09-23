@@ -9,8 +9,12 @@ import {
   forwardRef,
   Inject,
 } from '@nestjs/common';
-import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import {
+  getRepositoryToken,
+  InjectConnection,
+  InjectRepository,
+} from '@nestjs/typeorm';
+import { Connection, In, Repository } from 'typeorm';
 import { Sumula } from './entities/Sumula.entity';
 import { TeamService } from 'src/team/Team.service';
 import { ChampionshipService } from 'src/championship/Championship.service';
@@ -28,6 +32,7 @@ export class SumulaService {
     private readonly playerService: PlayerService,
     private readonly teamsService: TeamService,
     private readonly championshipService: ChampionshipService,
+    @InjectConnection() private readonly connection: Connection,
   ) {}
 
   async create(sumula: Sumula): Promise<Sumula> {
@@ -64,74 +69,38 @@ export class SumulaService {
     });
   }
 
-  somePointsOrFaults(type: string, statusGame: StatusGame[]) {
-    if (statusGame.length == 0) return 0;
-    return statusGame
-      .map((status) => status[type])
-      .reduce((currentValue, previousValue) => currentValue + previousValue);
+  async buildStatusTeam(sumulaId: number): Promise<team[]> {
+    const teams: team[] = await this.connection.query(`
+      SELECT sg."teamId", t.name, SUM(sg.point) AS points, SUM(sg.fault) AS faults 
+      FROM status_game sg 
+      LEFT JOIN team t ON t.id = sg."teamId"
+      WHERE sg."sumulaId" = ${sumulaId} 
+      GROUP BY sg."teamId", t.name
+    `);
+    return teams || [];
+  }
+  async buildStatusPlayer(
+    teams: number[],
+    sumulaId: number,
+  ): Promise<players[]> {
+    const players = await this.connection.query(`
+      SELECT pl.id, pl."userId", pl.infractions, pl."teamId", pl.name, pl."playerInMatchId", pin."sumulaId", coalesce(SUM(sg.point),0) as points, coalesce(SUM(sg.fault), 0) as faults
+      FROM player pl 
+      LEFT JOIN player_in_match pin ON pin.id = pl."playerInMatchId"
+      LEFT JOIN status_game sg ON pin.id = sg."playerInMatchId"
+      WHERE pl."teamId" in (${teams.join(
+        ',',
+      )}) and (pin."sumulaId" = ${sumulaId} or pin."sumulaId" is NULL)
+      group by pl.name, pl."playerInMatchId", pin."sumulaId", pl.id, pl."userId", pl.infractions, pl."teamId"
+    `);
+    return players;
   }
 
-  getPlayersTeams(players): players[] {
-    return players.map((player) => {
-      return {
-        ...player,
-        faults: this.somePointsOrFaults(
-          'fault',
-          player.playerInMatch?.statusGame
-            ? player.playerInMatch.statusGame
-            : [],
-        ),
-        points: this.somePointsOrFaults(
-          'point',
-          player.playerInMatch?.statusGame
-            ? player.playerInMatch.statusGame
-            : [],
-        ),
-      };
-    });
-  }
-  async buildStatusTeam(teams: Team[]): Promise<team[]> {
-    if (teams.length == 0) return [];
-    return Promise.all(
-      teams.map(async (teamItem) => {
-        return {
-          ...teamItem,
-          points: this.somePointsOrFaults('point', teamItem.statusGame || []),
-          faults: this.somePointsOrFaults('fault', teamItem.statusGame || []),
-          players: this.getPlayersTeams(teamItem.players),
-        };
-      }),
+  async buildStatusPeriod(sumulaId: number): Promise<periods[]> {
+    const periods: periods[] = await this.connection.query(
+      `SELECT SUM(sg.point) AS points, SUM(sg.fault) AS faults, period FROM status_game sg where sg."sumulaId" = ${sumulaId} GROUP BY period`,
     );
-  }
-
-  getPointsByTeamInPeriod(statusGame: StatusGame[], teams: Team[]): number {
-    const eachTeamPoints = teams.map((team) => {
-      const teamPoint = statusGame.find((stats) => stats.teamId == team.id);
-      return teamPoint.point;
-    });
-    return eachTeamPoints.reduce((cv, pv) => cv + pv);
-  }
-
-  async buildStatusPeriod(
-    periods: number,
-    statusGame: StatusGame[],
-  ): Promise<periods[]> {
-    if (statusGame.length == 0) return [];
-    console.log(periods);
-    return this.createArray(periods).map((periodNumber) => {
-      console.log(periodNumber);
-      const period = statusGame.filter((stats) => stats.period == periodNumber);
-      return {
-        points:
-          period.length == 0
-            ? 0
-            : period.map((stats) => stats.point).reduce((cv, pv) => cv + pv),
-        faults:
-          period.length == 0
-            ? 0
-            : period.map((stats) => stats.fault).reduce((cv, pv) => cv + pv),
-      };
-    });
+    return periods || [];
   }
 
   createArray(number) {
@@ -141,13 +110,7 @@ export class SumulaService {
   async getGameStatus({ id }: { id: string }): Promise<gameStatus> {
     const sumulaInfos = await this.sumulaRepository.findOne(id, {
       relations: [
-        'teams',
-        'teams.players',
-        'teams.players.playerInMatch',
-        'teams.players.playerInMatch.statusGame',
-        'teams.statusGame',
         'championship',
-        'playersInMatch',
         'championship.category',
         'statusGame',
         'statusGame.team',
@@ -156,15 +119,19 @@ export class SumulaService {
       ],
     });
     const processedsBuilders: Promise<any>[] = [
-      this.buildStatusTeam(sumulaInfos.teams),
-      this.buildStatusPeriod(sumulaInfos.actualPeriod, sumulaInfos.statusGame),
+      this.buildStatusTeam(parseInt(id)),
+      this.buildStatusPeriod(parseInt(id)),
     ];
     const [teams, periods] = await Promise.all(processedsBuilders);
-
+    const players = await this.buildStatusPlayer(
+      teams.map((team) => team.teamId),
+      parseInt(id),
+    );
     return {
       ...sumulaInfos,
       teams,
       periods,
+      players,
     } as gameStatus;
   }
 
@@ -238,11 +205,13 @@ export class SumulaService {
     if (player.infractions >= category.maxInfractionPerPlayer) {
       throw new BadRequestException('Error player cannot be insert game');
     }
-
-    return this.playerInMatchRepository.save({
+    const playerInMatchSaved = await this.playerInMatchRepository.save({
       sumulaId: parseInt(id),
       teamId: player.teamId,
       playerId: player.id,
+    });
+    return this.playerService.edit(player.id.toString(), {
+      playerInMatchId: playerInMatchSaved.id,
     });
   }
 }
