@@ -27,7 +27,7 @@ export class PlayerService {
       const userInDB = await this.userService.findOne({
         where: { playerId: player.id },
       });
-      console.log(userInDB);
+      console.log('USERRR', userInDB, player.id);
       if (userInDB) {
         return null;
       }
