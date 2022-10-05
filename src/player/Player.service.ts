@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
 import { UserService } from 'src/user/User.service';
-import { IsNull, Not, Repository } from 'typeorm';
+import { In, IsNull, Not, Repository } from 'typeorm';
 import { Player } from './Player.entity';
 
 @Injectable()
@@ -25,9 +25,13 @@ export class PlayerService {
   async createMany(players: any[], orgId: number, teamId: number) {
     await this.playerRepository.delete({
       teamId,
+      id: In(players.map((player) => player.id)),
     });
     await this.userService.remove({
-      where: { teamId, playerId: Not(IsNull()) },
+      where: {
+        teamId,
+        playerId: In(players.map((player) => player.id)),
+      },
     });
     const playersInsert = players.map(async (player) => {
       const user = await this.userService.create({

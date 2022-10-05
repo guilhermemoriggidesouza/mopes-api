@@ -29,7 +29,7 @@ export class User {
   @Column({ default: '' })
   rg: string;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ nullable: true })
   ra?: string;
 
   @Column({ default: '' })
