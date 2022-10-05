@@ -25,7 +25,6 @@ export class PlayerService {
   async createMany(players: any[], orgId: number, teamId: number) {
     const playersInsert = players.map(async (player) => {
       const playerInDb = await this.playerRepository.findOne(player.id);
-      console.log('USERRR', playerInDb, player);
       if (!playerInDb) {
         const user = await this.userService.create({
           name: player.name,
