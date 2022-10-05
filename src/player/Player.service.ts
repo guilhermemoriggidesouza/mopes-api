@@ -24,32 +24,29 @@ export class PlayerService {
 
   async createMany(players: any[], orgId: number, teamId: number) {
     const playersInsert = players.map(async (player) => {
-      const userInDB = await this.userService.findOne({
-        where: { playerId: player.id },
-      });
-      console.log('USERRR', userInDB, player.id);
-      if (userInDB) {
-        return null;
+      const playerInDb = await this.playerRepository.findOne(player.id);
+      console.log('USERRR', playerInDb, player);
+      if (!playerInDb) {
+        const user = await this.userService.create({
+          name: player.name,
+          login: player.login,
+          ra: player.ra,
+          rg: player.rg,
+          birthday: player.birthday,
+          class: player.class,
+          password: player.password,
+          orgId,
+          teamId: player.teamId,
+        });
+        const playerInserted = await this.create({
+          name: player.name,
+          teamId: player.teamId,
+          userId: user.id,
+        });
+        return this.userService.edit(user.id.toString(), {
+          playerId: playerInserted.id,
+        });
       }
-      const user = await this.userService.create({
-        name: player.name,
-        login: player.login,
-        ra: player.ra,
-        rg: player.rg,
-        birthday: player.birthday,
-        class: player.class,
-        password: player.password,
-        orgId,
-        teamId: player.teamId,
-      });
-      const playerInserted = await this.create({
-        name: player.name,
-        teamId: player.teamId,
-        userId: user.id,
-      });
-      return this.userService.edit(user.id.toString(), {
-        playerId: playerInserted.id,
-      });
     });
     return await Promise.all(playersInsert);
   }
