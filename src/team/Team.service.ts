@@ -81,12 +81,14 @@ export class TeamService {
     orgId: number;
   }) {
     if (coachs && teamId) {
-      coachs = coachs.map((coach) => ({
-        ...coach,
-        teamId,
-        orgId,
-        role: 'coach',
-      }));
+      coachs = coachs
+        .map((coach) => ({
+          ...coach,
+          teamId,
+          orgId,
+          role: 'coach',
+        }))
+        .filter((coach) => !coach.id);
       await this.userService.createMany(coachs, teamId);
     }
   }

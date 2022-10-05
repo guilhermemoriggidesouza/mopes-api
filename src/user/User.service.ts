@@ -23,10 +23,6 @@ export class UserService {
   }
 
   async createMany(Users: User[], teamId): Promise<User[]> {
-    await this.userRepository.delete({
-      teamId,
-      playerId: null,
-    });
     return Promise.all(Users.map(async (user) => this.create(user)));
   }
 
