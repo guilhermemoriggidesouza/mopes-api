@@ -23,17 +23,13 @@ export class PlayerService {
   }
 
   async createMany(players: any[], orgId: number, teamId: number) {
-    await this.playerRepository.delete({
-      teamId,
-      id: In(players.map((player) => player.id).filter((e) => e)),
-    });
-    await this.userService.remove({
-      where: {
-        teamId,
-        playerId: In(players.map((player) => player.id).filter((e) => e)),
-      },
-    });
     const playersInsert = players.map(async (player) => {
+      const userInDB = await this.userService.findOne({
+        where: { playerId: player.id },
+      });
+      if (userInDB) {
+        return null;
+      }
       const user = await this.userService.create({
         name: player.name,
         login: player.login,
