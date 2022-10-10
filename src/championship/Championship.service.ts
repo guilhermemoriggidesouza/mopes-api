@@ -124,6 +124,7 @@ export class ChampionshipService {
         'category',
         'owner',
         'sumulas',
+        'sumulas.teams',
         'championshipKeys',
         'championshipKeys.sumulas',
         'championshipKeys.sumulas.teams',
