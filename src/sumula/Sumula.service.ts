@@ -182,6 +182,8 @@ export class SumulaService {
   }
 
   async remove({ id, where }: { id?: string; where?: any }): Promise<any> {
+    await this.playerInMatchRepository.delete({ sumulaId: parseInt(id) });
+    await this.statusGameRepository.delete({ sumulaId: parseInt(id) });
     return await this.sumulaRepository.delete(id || where);
   }
 
