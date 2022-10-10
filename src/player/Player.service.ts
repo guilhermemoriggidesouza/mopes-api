@@ -68,12 +68,7 @@ export class PlayerService {
     return await this.playerRepository.update(id, payload);
   }
 
-  async addingFault(
-    id: number,
-    fault: number,
-    lastSumulaInfractionId: number,
-  ): Promise<any> {
-    await this.playerRepository.update({ id }, { lastSumulaInfractionId });
+  async addingFault(id: number, fault: number): Promise<any> {
     return await this.playerRepository.increment({ id }, 'infractions', fault);
   }
 }

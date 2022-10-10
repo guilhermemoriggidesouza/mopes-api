@@ -38,11 +38,6 @@ export class Player {
   @ManyToOne(() => Team, (team) => team.players)
   team?: Team;
 
-  @ManyToOne(() => Sumula)
-  lastSumulaInfraction?: Sumula;
-  @Column({ nullable: true })
-  lastSumulaInfractionId?: number;
-
   @OneToMany(() => PlayerInMatch, (PIM) => PIM.player)
   playerInMatch?: PlayerInMatch[];
 }

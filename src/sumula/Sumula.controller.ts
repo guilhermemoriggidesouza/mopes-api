@@ -100,7 +100,6 @@ export class SumulaController {
       await this.playerService.addingFault(
         payload.playerId,
         payload.data.fault,
-        parseInt(id),
       );
     }
     this.sumulaService.sendMessage(this.sumulaGateway.server, payload, id);
