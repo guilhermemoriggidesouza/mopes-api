@@ -85,10 +85,11 @@ export class SumulaService {
     sumulaId: number,
   ): Promise<players[]> {
     const players = await this.connection.query(`
-      SELECT pl.id, pl."userId", pl.infractions, pl."teamId", pl.name, pin.id as "playerInMatchId", pin."sumulaId", coalesce(SUM(sg.point),0) as points, coalesce(SUM(sg.fault), 0) as faults
+      SELECT pl.id, pl."userId", us.name as "userName", pl.infractions, pl."teamId", pl.name, pin.id as "playerInMatchId", pin."sumulaId", coalesce(SUM(sg.point),0) as points, coalesce(SUM(sg.fault), 0) as faults
       FROM player pl 
       LEFT JOIN player_in_match pin ON pl.id = pin."playerId" AND pin."sumulaId" = ${sumulaId} 
       LEFT JOIN status_game sg ON pin.id = sg."playerInMatchId"
+      LEFT JOUN user us ON us.id = pl."userId"
       WHERE pl."teamId" in (${teams.join(',')})      
       group by pl.name, pin.id, pin."sumulaId", pl.id, pl."userId", pl.infractions, pl."teamId"
     `);
