@@ -110,8 +110,8 @@ export class ChampionshipService {
     return this.championshipRepository.find(where && { where });
   }
 
-  async findAllChampionshipKeys(where: any): Promise<ChampionshipKeys[]> {
-    return this.championshipKeyRepository.find({ where });
+  async findAllChampionshipKeys(where?: any): Promise<ChampionshipKeys[]> {
+    return this.championshipKeyRepository.find(where && { where });
   }
 
   async findOne({
