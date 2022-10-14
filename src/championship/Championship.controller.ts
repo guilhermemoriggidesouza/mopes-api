@@ -45,7 +45,7 @@ export class ChampionshipController {
   ): Promise<Championship> {
     return await this.championshipService.findOne({
       id,
-      where: { 'championshipKeys.id': champioshipKeyId },
+      where: { championshipKeys: { id: champioshipKeyId } },
     });
   }
 
