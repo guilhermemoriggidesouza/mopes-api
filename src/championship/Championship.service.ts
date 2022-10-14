@@ -133,7 +133,6 @@ export class ChampionshipService {
         'championshipKeys.sumulas.teams',
       ],
     });
-    console.log(championshipKey);
     return championshipKey;
   }
 
