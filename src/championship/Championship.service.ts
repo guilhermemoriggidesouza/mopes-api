@@ -106,8 +106,12 @@ export class ChampionshipService {
     });
   }
 
-  async findAll(where: any): Promise<Championship[]> {
-    return this.championshipRepository.find({ where });
+  async findAll(where?: any): Promise<Championship[]> {
+    return this.championshipRepository.find(where && { where });
+  }
+
+  async findAllChampionshipKeys(where: any): Promise<ChampionshipKeys[]> {
+    return this.championshipKeyRepository.find({ where });
   }
 
   async findOne({

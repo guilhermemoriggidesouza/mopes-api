@@ -28,10 +28,19 @@ export class ChampionshipController {
     return await this.championshipService.findAll({ ownerId: req.user?.id });
   }
 
+  @Get(`championshipKeys`)
+  @Roles(Role.Admin)
+  async findAllChampionshipKeys(@Request() req: any): Promise<Championship[]> {
+    return await this.championshipService.findAll();
+  }
+
   @Get(`${urlBase}/:id`)
   @Roles(Role.Admin)
-  async findOne(@Param('id') id: string): Promise<Championship> {
-    return await this.championshipService.findOne({ id });
+  async findOne(
+    @Param('id') id: string,
+    @Body() payload: Championship,
+  ): Promise<Championship> {
+    return await this.championshipService.findOne({ id, where: payload });
   }
 
   @Get(`${urlBase}/:id/start`)
