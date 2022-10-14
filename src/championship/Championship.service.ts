@@ -122,14 +122,6 @@ export class ChampionshipService {
     where?: any;
   }): Promise<Championship> {
     const championshipKey = await this.championshipRepository.findOne(id, {
-      where: (qb) => {
-        qb.from('championshipKeys').where(
-          'championship.championshipKeys.id = :champioshipKeysId',
-          {
-            champioshipKeysId: where.championshipKey,
-          },
-        ); // Filter related field
-      },
       relations: [
         'category',
         'sumulas',
@@ -138,6 +130,14 @@ export class ChampionshipService {
         'championshipKeys.sumulas',
         'championshipKeys.sumulas.teams',
       ],
+      where: (qb) => {
+        qb.from('championship').where(
+          'championship.championshipKeys.id = :champioshipKeysId',
+          {
+            champioshipKeysId: where.championshipKey,
+          },
+        ); // Filter related field
+      },
     });
     return championshipKey;
   }
