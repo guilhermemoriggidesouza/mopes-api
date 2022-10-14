@@ -121,22 +121,23 @@ export class ChampionshipService {
     id?: string;
     where?: any;
   }): Promise<Championship> {
-    const championshipKey = await this.championshipRepository.findOne(id, {
-      where: (qb) => {
-        qb.where('championship.championshipKeys.id = :championshipKeyId', {
-          championshipKeyId: where.championshipKeys.id,
-        });
+    const championshipKey = await this.championshipKeyRepository.findOne(
+      where.championshipKeys.id,
+    );
+    const championship = await this.championshipRepository.findOne(
+      championshipKey.championshipId,
+      {
+        relations: [
+          'category',
+          'sumulas',
+          'sumulas.teams',
+          'championshipKeys',
+          'championshipKeys.sumulas',
+          'championshipKeys.sumulas.teams',
+        ],
       },
-      relations: [
-        'category',
-        'sumulas',
-        'sumulas.teams',
-        'championshipKeys',
-        'championshipKeys.sumulas',
-        'championshipKeys.sumulas.teams',
-      ],
-    });
-    return championshipKey;
+    );
+    return championship;
   }
 
   async remove(id: string): Promise<any> {
