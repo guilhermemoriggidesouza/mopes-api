@@ -124,7 +124,7 @@ export class ChampionshipService {
     const championshipKey = await this.championshipRepository.findOne(id, {
       where: (qb) => {
         qb.where('championship.championshipKeys.id = :champioshipKeysId', {
-          champioshipKeysId: where.championshipKeys.id,
+          champioshipKeysId: where.championshipKey,
         }); // Filter related field
       },
       relations: [
