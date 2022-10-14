@@ -131,9 +131,12 @@ export class ChampionshipService {
         'championshipKeys.sumulas.teams',
       ],
       where: (qb) => {
-        qb.where('championshipKeys.id = :champioshipKeysId', {
-          champioshipKeysId: where.championshipKey,
-        }); // Filter related field
+        qb.from('championshipKeys').where(
+          'championshipKeys.id = :champioshipKeysId',
+          {
+            champioshipKeysId: where.championshipKey,
+          },
+        ); // Filter related field
       },
     });
     return championshipKey;
