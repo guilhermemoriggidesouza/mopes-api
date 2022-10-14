@@ -15,6 +15,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Championship } from './entities/Championship.entity';
 import { ChampionshipService } from './Championship.service';
+import { ChampionshipKeys } from './entities/ChampionshipKeys.entity';
 const urlBase: string = '/championship';
 
 @Controller()
@@ -30,7 +31,7 @@ export class ChampionshipController {
 
   @Get(`championshipKeys`)
   @Roles(Role.Admin)
-  async findAllChampionshipKeys(@Request() req: any): Promise<Championship[]> {
+  async findAllChampionshipKeys(@Request() req: any): Promise<ChampionshipKeys[]> {
     return await this.championshipService.findAllChampionshipKeys();
   }
 
