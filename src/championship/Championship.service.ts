@@ -123,7 +123,7 @@ export class ChampionshipService {
   }): Promise<Championship> {
     const championshipKey = await this.championshipRepository.findOne(id, {
       where: {
-        championshipKeys: { id: In(where.championshipKeys.id) },
+        championshipKeys: { id: In(where.championshipKeys.id) } ,
       },
       relations: [
         'category',
