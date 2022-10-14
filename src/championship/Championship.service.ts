@@ -134,6 +134,7 @@ export class ChampionshipService {
       ],
     });
     console.log(championshipKey);
+    return championshipKey;
   }
 
   async remove(id: string): Promise<any> {
