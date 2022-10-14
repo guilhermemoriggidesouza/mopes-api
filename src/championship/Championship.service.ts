@@ -121,9 +121,12 @@ export class ChampionshipService {
     id?: string;
     where?: any;
   }): Promise<Championship> {
-    console.log(where);
     const championshipKey = await this.championshipRepository.findOne(id, {
-      where,
+      where: (qb) => {
+        qb.where('championshipKeys.id = :championshipKeyId', {
+          championshipKeyId: where.championshipKey.id,
+        });
+      },
       relations: [
         'category',
         'sumulas',
