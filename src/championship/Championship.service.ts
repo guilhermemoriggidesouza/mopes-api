@@ -126,7 +126,7 @@ export class ChampionshipService {
     });
     championship.championshipKeys = [
       await this.championshipKeyRepository.findOne(where.championshipKeys.id, {
-        relations: ['sumulas, sumulas.teams'],
+        relations: ['sumulas', 'sumulas.teams'],
       }),
     ];
     return championship;
