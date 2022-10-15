@@ -122,7 +122,12 @@ export class ChampionshipService {
     where?: any;
   }): Promise<Championship> {
     const championship = await this.championshipRepository.findOne(id, {
-      relations: ['category'],
+      relations: [
+        'category',
+        'championshipKeys',
+        'championshipKeys.sumulas',
+        'championshipKeys.sumulas.teams',
+      ],
     });
     championship.sumulas = await this.sumulasService.findAll(
       {
@@ -131,11 +136,6 @@ export class ChampionshipService {
       },
       ['teams'],
     );
-    championship.championshipKeys = [
-      await this.championshipKeyRepository.findOne(where.championshipKeys.id, {
-        relations: ['sumulas', 'sumulas.teams'],
-      }),
-    ];
     return championship;
   }
 
