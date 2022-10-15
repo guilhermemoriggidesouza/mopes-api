@@ -37,7 +37,7 @@ export class ChampionshipController {
     return await this.championshipService.findAllChampionshipKeys();
   }
 
-  @Get(`${urlBase}/:id/championshipKeyId/`)
+  @Get(`${urlBase}/:id`)
   @Roles(Role.Admin)
   async findOne(@Param('id') id: string): Promise<Championship> {
     return await this.championshipService.findOne({
