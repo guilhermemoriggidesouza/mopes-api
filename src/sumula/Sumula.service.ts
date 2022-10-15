@@ -47,10 +47,14 @@ export class SumulaService {
       .execute();
   }
 
-  async findAll(): Promise<Sumula[]> {
+  async findAll(where?: any, relations?: any): Promise<Sumula[]> {
     return this.sumulaRepository.find({
-      relations: ['teams', 'championship', 'championship.category'],
-      where: {
+      relations: relations || [
+        'teams',
+        'championship',
+        'championship.category',
+      ],
+      where: where || {
         championship: {
           started: true,
         },
