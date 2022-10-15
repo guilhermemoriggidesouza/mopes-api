@@ -89,7 +89,7 @@ export class SumulaService {
       FROM player pl 
       LEFT JOIN player_in_match pin ON pl.id = pin."playerId" AND pin."sumulaId" = ${sumulaId} 
       LEFT JOIN status_game sg ON pin.id = sg."playerInMatchId"
-      LEFT JOUN user us ON us.id = pl."userId"
+      LEFT JOIN user us ON us.id = pl."userId"
       WHERE pl."teamId" in (${teams.join(',')})      
       group by pl.name, pin.id, pin."sumulaId", pl.id, pl."userId", pl.infractions, pl."teamId"
     `);
