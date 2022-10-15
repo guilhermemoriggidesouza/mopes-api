@@ -22,6 +22,6 @@ export class ChampionshipKeys {
   @Column()
   championshipId: number;
 
-  @OneToMany(() => Sumula, (champKey) => champKey.championshipKeys)
+  @OneToMany(() => Sumula, (sumula) => sumula.championshipKeys)
   sumulas?: Sumula[];
 }

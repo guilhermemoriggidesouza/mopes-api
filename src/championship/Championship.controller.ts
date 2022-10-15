@@ -15,6 +15,7 @@ import {
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Championship } from './entities/Championship.entity';
 import { ChampionshipService } from './Championship.service';
+import { ChampionshipKeys } from './entities/ChampionshipKeys.entity';
 const urlBase: string = '/championship';
 
 @Controller()
@@ -28,10 +29,24 @@ export class ChampionshipController {
     return await this.championshipService.findAll({ ownerId: req.user?.id });
   }
 
-  @Get(`${urlBase}/:id`)
+  @Get(`championshipKeys`)
   @Roles(Role.Admin)
-  async findOne(@Param('id') id: string): Promise<Championship> {
-    return await this.championshipService.findOne({ id });
+  async findAllChampionshipKeys(
+    @Request() req: any,
+  ): Promise<ChampionshipKeys[]> {
+    return await this.championshipService.findAllChampionshipKeys();
+  }
+
+  @Get(`${urlBase}/:id/championshipKeyId/:champioshipKeyId`)
+  @Roles(Role.Admin)
+  async findOne(
+    @Param('id') id: string,
+    @Param('champioshipKeyId') champioshipKeyId: string,
+  ): Promise<Championship> {
+    return await this.championshipService.findOne({
+      id,
+      where: { championshipKeys: { id: champioshipKeyId } },
+    });
   }
 
   @Get(`${urlBase}/:id/start`)

@@ -106,8 +106,12 @@ export class ChampionshipService {
     });
   }
 
-  async findAll(where: any): Promise<Championship[]> {
-    return this.championshipRepository.find({ where });
+  async findAll(where?: any): Promise<Championship[]> {
+    return this.championshipRepository.find(where && { where });
+  }
+
+  async findAllChampionshipKeys(where?: any): Promise<ChampionshipKeys[]> {
+    return this.championshipKeyRepository.find(where && { where });
   }
 
   async findOne({
@@ -117,19 +121,15 @@ export class ChampionshipService {
     id?: string;
     where?: any;
   }): Promise<Championship> {
-    return this.championshipRepository.findOne(id, {
-      where,
-      relations: [
-        'teams',
-        'category',
-        'owner',
-        'sumulas',
-        'sumulas.teams',
-        'championshipKeys',
-        'championshipKeys.sumulas',
-        'championshipKeys.sumulas.teams',
-      ],
+    const championship = await this.championshipRepository.findOne(id, {
+      relations: ['category', 'sumulas', 'sumulas.teams'],
     });
+    championship.championshipKeys = [
+      await this.championshipKeyRepository.findOne(where.championshipKeys.id, {
+        relations: ['sumulas', 'sumulas.teams'],
+      }),
+    ];
+    return championship;
   }
 
   async remove(id: string): Promise<any> {
