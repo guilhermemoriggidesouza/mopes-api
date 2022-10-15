@@ -126,6 +126,7 @@ export class ChampionshipService {
     });
     championship.sumulas = await this.sumulasService.findAll({
       championshipKeysId: null,
+      ChampionshipId: id,
       relations: ['teams'],
     });
     championship.championshipKeys = [
