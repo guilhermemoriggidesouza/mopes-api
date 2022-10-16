@@ -243,18 +243,32 @@ export class SumulaService {
   async addingPlayerInMatch(id: string, payload: any): Promise<any> {
     const {
       championship: { category },
+      teams,
     } = await this.sumulaRepository.findOne(id, {
-      relations: ['championship', 'championship.category'],
+      relations: [
+        'championship',
+        'championship.category',
+        'teams',
+        'teams.players',
+      ],
     });
     const playerInMatch = await this.playerInMatchRepository.findOne({
       where: { playerId: payload.playerId, sumulaId: id },
     });
     if (playerInMatch) {
-      throw new BadRequestException('Error player cannot be insert game');
+      throw new BadRequestException('PLAYERINMATCH');
+    }
+
+    if (
+      teams
+        .flatMap((team) => team.players.flatMap((player) => player.id))
+        .find((plId) => plId == payload.playerId) === undefined
+    ) {
+      throw new BadRequestException('PLAYERNOTINTEAM');
     }
     const player = await this.playerService.findOne({ id: payload.playerId });
     if (player.infractions >= category.maxInfractionPerPlayer) {
-      throw new BadRequestException('Error player cannot be insert game');
+      throw new BadRequestException('MAXINFRACTIONS');
     }
     await this.playerInMatchRepository.save({
       sumulaId: parseInt(id),
