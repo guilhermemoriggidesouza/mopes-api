@@ -7,6 +7,7 @@ import { Connection, Repository } from 'typeorm';
 import { Team } from './Team.entity';
 import { User } from 'src/user/User.entity';
 import { Championship } from 'src/championship/entities/Championship.entity';
+import { table } from 'console';
 
 @Injectable()
 export class TeamService {
@@ -203,6 +204,14 @@ export class TeamService {
       ...game,
       ...this.validateResultGame(game.id, tableGamesResults),
     }));
+    const keys = new Set(tableGame.map((game) => game.key));
+    tableGame = [...keys].flatMap((key) => {
+      const gameKeys = tableGame.filter((game) => game.key == key);
+      gameKeys.sort((teamA, teamB) =>
+        parseInt(teamA.point) < parseInt(teamB.point) ? 1 : -1,
+      );
+      return gameKeys;
+    });
     return tableGame;
   }
 }
