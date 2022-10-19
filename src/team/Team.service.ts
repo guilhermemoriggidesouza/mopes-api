@@ -152,7 +152,9 @@ export class TeamService {
       from sumula s
       inner join sumula_teams_team stt ON stt."sumulaId" = s.id
       left join status_game sg ON sg."sumulaId" = s.id and sg."teamId" = stt."teamId"
-      where s."championshipId" = ${championshipId}
+      inner join championship c ON c.id = s."championshipId"
+      inner join category_game cg ON cg.id = c."categoryId"
+      where s."championshipId" = ${championshipId} and s."actualPeriod" = cg."maxPeriod"
       group by stt."teamId", s.id
       order by s.id
     `);
