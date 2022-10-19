@@ -117,7 +117,7 @@ export class TeamService {
         (result) => result.sumulaId == game.sumulaId,
       );
       const morePoints = teamsInGame.sort(
-        (teamA, teamB) => teamA.sum - teamB.sum,
+        (teamA, teamB) => parseInt(teamA.sum) - parseInt(teamB.sum),
       );
       console.log(
         teamId,
