@@ -99,6 +99,10 @@ export class TeamService {
     await this.connection.query(``);
   }
 
+  allEqual(arr) {
+    return new Set(arr).size == 1;
+  }
+
   validateResultGame(teamId, resultsGames) {
     const gamesForTeam = resultsGames.filter(
       (result) => result.teamId == teamId,
@@ -113,14 +117,10 @@ export class TeamService {
         (result) => result.sumulaId == game.sumulaId,
       );
       const morePoints = teamsInGame.sort(
-        (teamA, teamB) => teamA.point - teamB.point,
+        (teamA, teamB) => teamA.point + teamB.point,
       );
 
-      if (
-        morePoints
-          .map((status) => status.point)
-          .every((val, i, arr) => val === arr[0])
-      ) {
+      if (this.allEqual(morePoints.map((status) => status.point))) {
         ties++;
         point++;
         return;
