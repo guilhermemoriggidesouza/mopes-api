@@ -119,8 +119,13 @@ export class TeamService {
       const morePoints = teamsInGame.sort(
         (teamA, teamB) => teamA.point + teamB.point,
       );
-
-      if (this.allEqual(morePoints.map((status) => status.point))) {
+      console.log(
+        teamId,
+        game.sumulaId,
+        this.allEqual(morePoints.map((status) => status.sum)),
+        morePoints,
+      );
+      if (this.allEqual(morePoints.map((status) => status.sum))) {
         ties++;
         point++;
         return;
