@@ -95,12 +95,68 @@ export class TeamService {
     }
   }
 
+  async generatePoints(id: string) {
+    await this.connection.query(``);
+  }
+
+  async validateResultGame(teamId, resultsGames) {
+    const gamesForTeam = resultsGames.filter(
+      (result) => result.teamId == teamId,
+    );
+    let ties = 0,
+      victorys = 0,
+      point = 0,
+      defeats = 0;
+
+    gamesForTeam.map((game) => {
+      const teamsInGame = resultsGames.filter(
+        (result) => result.sumulaId == game.sumulaId,
+      );
+      const morePoints = teamsInGame.sort(
+        (teamA, teamB) => teamA.point - teamB.point,
+      );
+
+      if (
+        morePoints
+          .map((status) => status.point)
+          .every((val, i, arr) => val === arr[0])
+      ) {
+        ties++;
+        point++;
+        return;
+      }
+
+      if (morePoints[0].teamId == teamId) {
+        victorys++;
+        point = point + 3;
+      } else {
+        defeats++;
+      }
+    });
+
+    return {
+      victorys,
+      ties,
+      point,
+      defeats,
+    };
+  }
+
   async findTableGame({
     championshipId,
   }: {
     championshipId: string;
   }): Promise<tableGame> {
-    const tableGame = await this.connection.query(`
+    const tableGamesResults = await this.connection.query(`
+      SELECT stt."teamId", s.id as "sumulaId", SUM(COALESCE(sg.point, 0))
+      from sumula s
+      inner join sumula_teams_team stt ON stt."sumulaId" = s.id
+      left join status_game sg ON sg."sumulaId" = s.id and sg."teamId" = stt."teamId"
+      where s."championshipId" = ${championshipId}
+      group by stt."teamId", s.id
+      order by s.id
+    `);
+    let tableGame = await this.connection.query(`
       SELECT 
         te.id,
         te."name" as "nameTeam",
@@ -108,7 +164,6 @@ export class TeamService {
         COALESCE(sum(status_game."point"), 0) as "pointsDoIt",  
         pointsRestrict.total as "pointsDontDoIt",
         (sum(status_game."point") - pointsRestrict.total) as "balancePoints",
-        sum(status_game."fault") as "faults",
         championship_keys.name as key
       FROM public.team te
       LEFT JOIN LATERAL (
@@ -135,8 +190,12 @@ export class TeamService {
       LEFT JOIN championship_keys ON championship_keys.id = sumula."championshipKeysId"
       where championship.id = ${championshipId}
       GROUP by te.name, game.total, pointsRestrict.total, championship_keys.name, te.id
-      ORDER BY "pointsDoIt" DESC, game.total DESC
+      ORDER BY key ASC NULLS LAST    
     `);
+    tableGame = tableGame.map((game) => ({
+      ...game,
+      ...this.validateResultGame(game.id, tableGamesResults),
+    }));
     return tableGame;
   }
 }
