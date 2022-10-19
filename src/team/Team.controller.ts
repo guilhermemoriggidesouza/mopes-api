@@ -35,6 +35,14 @@ export class TeamController {
     return await this.teamService.findOne({ id });
   }
 
+  @Get(`${urlBase}/:championshipId/relatory`)
+  @Roles(Role.Admin)
+  async findTableGame(
+    @Param('championshipId') championshipId: string,
+  ): Promise<tableGame> {
+    return await this.teamService.findTableGame({ championshipId });
+  }
+
   @Post(`${urlBase}`)
   @Roles(Role.Admin)
   async createTeam(@Body() payload: Team, @Request() req: any): Promise<Team> {

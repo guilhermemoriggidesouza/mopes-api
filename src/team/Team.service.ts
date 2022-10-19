@@ -2,10 +2,11 @@ import { UserService } from 'src/user/User.service';
 import { PlayerService } from './../player/Player.service';
 import { Player } from 'src/player/Player.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
+import { Connection, Repository } from 'typeorm';
 import { Team } from './Team.entity';
 import { User } from 'src/user/User.entity';
+import { Championship } from 'src/championship/entities/Championship.entity';
 
 @Injectable()
 export class TeamService {
@@ -14,6 +15,7 @@ export class TeamService {
     private userService: UserService,
     @InjectRepository(Team)
     private teamRepository: Repository<Team>,
+    @InjectConnection() private readonly connection: Connection,
   ) {}
 
   async create(Team: Team, creatorId: number, orgId: number): Promise<Team> {
@@ -91,5 +93,50 @@ export class TeamService {
         .filter((coach) => !coach.id);
       await this.userService.createMany(coachs, teamId);
     }
+  }
+
+  async findTableGame({
+    championshipId,
+  }: {
+    championshipId: string;
+  }): Promise<tableGame> {
+    const tableGame = await this.connection.query(`
+      SELECT 
+        te.id,
+        te."name" as "nameTeam",
+        game.total as "game",
+        COALESCE(sum(status_game."point"), 0) as "pointsDoIt",  
+        pointsRestrict.total as "pointsDontDoIt",
+        (sum(status_game."point") - pointsRestrict.total) as "balancePoints",
+        sum(status_game."fault") as "faults",
+        championship_keys.name as key
+      FROM public.team te
+      LEFT JOIN LATERAL (
+        SELECT count(*) as total
+        FROM sumula_teams_team stt
+        INNER JOIN sumula ON sumula.id = stt."sumulaId"
+        INNER JOIN championship ON championship.id = sumula."championshipId"
+        INNER JOIN category_game ON category_game.id = championship."categoryId"
+        WHERE  te.id = stt."teamId" AND category_game."maxPeriod" = sumula."actualPeriod"
+      ) as game ON 1=1
+      LEFT JOIN LATERAL (
+        SELECT 
+          SUM(sg2.point) as total
+        FROM 
+          sumula_teams_team stt
+          INNER JOIN status_game sg2 ON sg2."teamId" <> stt."teamId" AND sg2."sumulaId" = stt."sumulaId"
+        WHERE 
+          stt."teamId" = te.id
+      ) as pointsRestrict ON 1=1
+      LEFT JOIN sumula_teams_team ON sumula_teams_team."teamId" = te.id
+      LEFT JOIN sumula ON sumula_teams_team."sumulaId" = sumula.id
+      LEFT JOIN status_game ON status_game."sumulaId" = sumula.id and status_game."teamId" = te.id
+      LEFT JOIN championship ON championship.id = sumula."championshipId"
+      LEFT JOIN championship_keys ON championship_keys.id = sumula."championshipKeysId"
+      where championship.id = ${championshipId}
+      GROUP by te.name, game.total, pointsRestrict.total, championship_keys.name, te.id
+      ORDER BY "pointsDoIt" DESC, game.total DESC
+    `);
+    return tableGame;
   }
 }
