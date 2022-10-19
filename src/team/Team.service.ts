@@ -99,7 +99,7 @@ export class TeamService {
     await this.connection.query(``);
   }
 
-  async validateResultGame(teamId, resultsGames) {
+  validateResultGame(teamId, resultsGames) {
     const gamesForTeam = resultsGames.filter(
       (result) => result.teamId == teamId,
     );
