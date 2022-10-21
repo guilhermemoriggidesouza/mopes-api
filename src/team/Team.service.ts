@@ -208,7 +208,11 @@ export class TeamService {
     tableGame = [...keys].flatMap((key) => {
       const gameKeys = tableGame.filter((game) => game.key == key);
       gameKeys.sort((teamA, teamB) =>
-        parseInt(teamA.point) < parseInt(teamB.point) ? 1 : -1,
+        parseInt(teamA.point) < parseInt(teamB.point)
+          ? 1
+          : -1 && parseInt(teamA.balancePoints) < parseInt(teamB.balancePoints)
+          ? 1
+          : -1,
       );
       return gameKeys;
     });

@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './User.entity';
@@ -8,6 +9,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async create(User: User): Promise<User> {
@@ -43,5 +45,11 @@ export class UserService {
 
   async edit(id: string, payload: any): Promise<any> {
     return await this.userRepository.update(id, payload);
+  }
+
+  async getLoginLink(id: string): Promise<any> {
+    const user = await this.userRepository.findOne(id);
+    const { password, teamsCreated, ...result } = user;
+    return { access_token: this.jwtService.sign(result) };
   }
 }

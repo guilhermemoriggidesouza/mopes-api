@@ -33,6 +33,12 @@ export class UserController {
     return await this.userService.findOne({ id });
   }
 
+  @Get(`${urlBase}/:id/login/link`)
+  @Roles(Role.Player, Role.Admin)
+  async findOneLink(@Param('id') id: string): Promise<User> {
+    return await this.userService.getLoginLink(id);
+  }
+
   @Post(`${urlBase}`)
   @Roles(Role.Admin)
   async createUser(@Body() payload: User): Promise<User> {
