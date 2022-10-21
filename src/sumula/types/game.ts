@@ -1,6 +1,6 @@
 type periods = {
-  faults: number;
-  points: number;
+  period: string;
+  teams: team[];
 };
 type playersInMatch = {
   id: number;

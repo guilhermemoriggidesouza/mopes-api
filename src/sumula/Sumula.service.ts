@@ -100,11 +100,29 @@ export class SumulaService {
     return players;
   }
 
+  groupBy(xs, key) {
+    return xs.reduce(function (rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  }
+
   async buildStatusPeriod(sumulaId: number): Promise<periods[]> {
     const periods: periods[] = await this.connection.query(
-      `SELECT SUM(sg.point) AS points, SUM(sg.fault) AS faults, period FROM status_game sg where sg."sumulaId" = ${sumulaId} GROUP BY period`,
+      `
+        SELECT te.name, SUM(sg.point) AS points, SUM(sg.fault) AS faults, sg.period 
+        FROM status_game sg
+        LEFT OUTER JOIN team te ON sg."teamId" = te.id
+        WHERE sg."sumulaId" = ${sumulaId} 
+        GROUP BY sg.period, te.name
+      `,
     );
-    return periods || [];
+    const periodsNumber = this.groupBy(periods, 'period');
+
+    return Object.entries(periodsNumber).map(([key, value]) => ({
+      period: key,
+      teams: value as team[],
+    }));
   }
 
   async sendMessage(sender: Server, payload, sumulaId) {
