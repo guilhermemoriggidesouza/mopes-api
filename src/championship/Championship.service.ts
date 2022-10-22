@@ -141,7 +141,7 @@ export class ChampionshipService {
 
   async remove(id: string): Promise<any> {
     const sumulas = await this.sumulasService.findAll({
-      where: { championshipId: parseInt(id) },
+      championshipId: parseInt(id),
     });
     await Promise.all(
       sumulas.map((sumula) =>
