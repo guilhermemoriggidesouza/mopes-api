@@ -140,9 +140,14 @@ export class ChampionshipService {
   }
 
   async remove(id: string): Promise<any> {
-    await this.sumulasService.remove({
+    const sumulas = await this.sumulasService.findAll({
       where: { championshipId: parseInt(id) },
     });
+    await Promise.all(
+      sumulas.map((sumula) =>
+        this.sumulasService.remove({ id: sumula.id.toString() }),
+      ),
+    );
     await this.championshipKeyRepository.delete({
       championshipId: parseInt(id),
     });
