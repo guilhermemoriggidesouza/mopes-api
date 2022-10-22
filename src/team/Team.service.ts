@@ -219,49 +219,6 @@ export class TeamService {
       ${groupByKey ? 'ORDER BY key ASC NULLS LAST' : ''}
     `);
 
-    console.log(`
-    SELECT 
-      te.id,
-      te."name" as "nameTeam",
-      game.total as "game",
-      COALESCE(sum(status_game."point"), 0) as "pointsDoIt",  
-      pointsRestrict.total as "pointsDontDoIt",
-      (sum(status_game."point") - pointsRestrict.total) as "balancePoints"
-      ${groupByKey ? `, championship_keys.name as key` : ''}
-    FROM public.team te
-    LEFT JOIN LATERAL (
-      SELECT count(*) as total
-      FROM sumula_teams_team stt
-      INNER JOIN sumula ON sumula.id = stt."sumulaId"
-      INNER JOIN championship ON championship.id = sumula."championshipId"
-      INNER JOIN category_game ON category_game.id = championship."categoryId"
-      WHERE  te.id = stt."teamId" AND category_game."maxPeriod" = sumula."actualPeriod"
-    ) as game ON 1=1
-    LEFT JOIN LATERAL (
-      SELECT 
-        SUM(sg2.point) as total
-      FROM 
-        sumula_teams_team stt
-        INNER JOIN status_game sg2 ON sg2."teamId" <> stt."teamId" AND sg2."sumulaId" = stt."sumulaId"
-      WHERE 
-        stt."teamId" = te.id
-    ) as pointsRestrict ON 1=1
-    LEFT JOIN sumula_teams_team ON sumula_teams_team."teamId" = te.id
-    LEFT JOIN sumula ON sumula_teams_team."sumulaId" = sumula.id
-    LEFT JOIN status_game ON status_game."sumulaId" = sumula.id and status_game."teamId" = te.id
-    LEFT JOIN championship ON championship.id = sumula."championshipId"
-    ${
-      groupByKey
-        ? `LEFT JOIN championship_keys ON championship_keys.id = sumula."championshipKeysId"`
-        : ''
-    }
-    where championship.id = ${championshipId}
-    GROUP by te.name, game.total, pointsRestrict.total, te.id${
-      groupByKey ? ', championship_keys.name' : ''
-    }
-    ${groupByKey ? 'ORDER BY key ASC NULLS LAST' : ''}
-  `);
-
     tableGame = tableGame.map((game) => ({
       ...game,
       ...this.validateResultGame(game.id, tableGamesResults),
