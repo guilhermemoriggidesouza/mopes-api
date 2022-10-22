@@ -198,7 +198,7 @@ export class TeamService {
       LEFT JOIN championship_keys ON championship_keys.id = sumula."championshipKeysId"
       where championship.id = ${championshipId}
       GROUP by te.name, game.total, pointsRestrict.total, championship_keys.name, te.id
-      ORDER BY key ASC NULLS LAST, "balancePoints" DESC, "pointsDoIt" DESC, "pointsDontDoIt" DESC
+      ORDER BY "balancePoints" DESC, key ASC NULLS LAST
     `);
     tableGame = tableGame.map((game) => ({
       ...game,
