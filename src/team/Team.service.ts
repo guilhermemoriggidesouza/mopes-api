@@ -216,7 +216,7 @@ export class TeamService {
       GROUP by te.name, game.total, pointsRestrict.total, te.id${
         groupByKey ? ', championship_keys.name' : ''
       }
-      ${groupByKey ? ', ORDER BY key ASC NULLS LAST' : ''}
+      ${groupByKey ? 'ORDER BY key ASC NULLS LAST' : ''}
     `);
 
     tableGame = tableGame.map((game) => ({
