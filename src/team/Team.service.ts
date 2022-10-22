@@ -213,8 +213,8 @@ export class TeamService {
           : ''
       }
       where championship.id = ${championshipId}
-      GROUP by te.name, game.total, pointsRestrict.total, te.id, ${
-        groupByKey ? 'championship_keys.name' : ''
+      GROUP by te.name, game.total, pointsRestrict.total, te.id${
+        groupByKey ? ', championship_keys.name' : ''
       }
       ORDER BY key ASC NULLS LAST
     `);
