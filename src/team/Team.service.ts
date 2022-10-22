@@ -209,12 +209,12 @@ export class TeamService {
       const gameKeys = tableGame.filter((game) => game.key == key);
       gameKeys
         .sort((teamA, teamB) =>
+          parseInt(teamA.point) < parseInt(teamB.point) ? 1 : -1,
+        )
+        .sort((teamA, teamB) =>
           parseInt(teamA.balancePoints) < parseInt(teamB.balancePoints)
             ? 1
             : -1,
-        )
-        .sort((teamA, teamB) =>
-          parseInt(teamA.point) < parseInt(teamB.point) ? 1 : -1,
         );
       return gameKeys;
     });
