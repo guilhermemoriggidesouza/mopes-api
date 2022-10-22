@@ -188,7 +188,7 @@ export class SumulaService {
       ],
     });
     const processedsBuilders: Promise<any>[] = [
-      this.buildStatusTeam(parseInt(id), sumulaInfos.teams),
+      this.buto aqildStatusTeam(parseInt(id), sumulaInfos.teams),
       this.buildStatusPeriod(parseInt(id)),
     ];
     const [teams, periods] = await Promise.all(processedsBuilders);

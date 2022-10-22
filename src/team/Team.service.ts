@@ -212,6 +212,11 @@ export class TeamService {
           ? 1
           : -1 && parseInt(teamA.balancePoints) < parseInt(teamB.balancePoints)
           ? 1
+          : -1 && parseInt(teamA.pointsDoIt) < parseInt(teamB.pointsDoIt)
+          ? 1
+          : -1 &&
+            parseInt(teamA.pointsDontDoIt) > parseInt(teamB.pointsDontDoIt)
+          ? 1
           : -1,
       );
       return gameKeys;
