@@ -183,8 +183,8 @@ export class TeamService {
         game.total as "game",
         COALESCE(sum(status_game."point"), 0) as "pointsDoIt",  
         pointsRestrict.total as "pointsDontDoIt",
-        (sum(status_game."point") - pointsRestrict.total) as "balancePoints",
-        ${groupByKey ? `championship_keys.name as key` : ''}
+        (sum(status_game."point") - pointsRestrict.total) as "balancePoints"
+        ${groupByKey ? `, championship_keys.name as key` : ''}
       FROM public.team te
       LEFT JOIN LATERAL (
         SELECT count(*) as total
