@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   Request,
   UseGuards,
@@ -39,8 +40,9 @@ export class TeamController {
   @Roles(Role.Admin)
   async findTableGame(
     @Param('championshipId') championshipId: string,
+    @Query('groupByKey') groupByKey: boolean,
   ): Promise<tableGame> {
-    return await this.teamService.findTableGame({ championshipId });
+    return await this.teamService.findTableGame({ championshipId, groupByKey });
   }
 
   @Post(`${urlBase}`)

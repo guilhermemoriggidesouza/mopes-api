@@ -120,12 +120,7 @@ export class TeamService {
       const morePoints = teamsInGame.sort((teamA, teamB) =>
         parseInt(teamA.sum) < parseInt(teamB.sum) ? 1 : -1,
       );
-      console.log(
-        teamId,
-        game.sumulaId,
-        this.allEqual(morePoints.map((status) => status.sum)),
-        morePoints,
-      );
+
       if (this.allEqual(morePoints.map((status) => status.sum))) {
         ties++;
         point++;
@@ -148,11 +143,28 @@ export class TeamService {
     };
   }
 
+  sortGames(arr) {
+    return [
+      ...arr
+        .sort((teamA, teamB) =>
+          parseInt(teamA.point) < parseInt(teamB.point) ? 1 : -1,
+        )
+        .sort((teamA, teamB) =>
+          parseInt(teamA.balancePoints) < parseInt(teamB.balancePoints)
+            ? 1
+            : -1,
+        ),
+    ];
+  }
+
   async findTableGame({
     championshipId,
+    groupByKey,
   }: {
     championshipId: string;
+    groupByKey: boolean;
   }): Promise<tableGame> {
+    console.log(groupByKey)
     const tableGamesResults = await this.connection.query(`
       SELECT stt."teamId", s.id as "sumulaId", SUM(COALESCE(sg.point, 0))
       from sumula s
@@ -172,7 +184,7 @@ export class TeamService {
         COALESCE(sum(status_game."point"), 0) as "pointsDoIt",  
         pointsRestrict.total as "pointsDontDoIt",
         (sum(status_game."point") - pointsRestrict.total) as "balancePoints",
-        championship_keys.name as key
+        ${groupByKey ? `championship_keys.name as key` : ''}
       FROM public.team te
       LEFT JOIN LATERAL (
         SELECT count(*) as total
@@ -195,29 +207,32 @@ export class TeamService {
       LEFT JOIN sumula ON sumula_teams_team."sumulaId" = sumula.id
       LEFT JOIN status_game ON status_game."sumulaId" = sumula.id and status_game."teamId" = te.id
       LEFT JOIN championship ON championship.id = sumula."championshipId"
-      LEFT JOIN championship_keys ON championship_keys.id = sumula."championshipKeysId"
+      ${
+        groupByKey
+          ? `LEFT JOIN championship_keys ON championship_keys.id = sumula."championshipKeysId"`
+          : ''
+      }
       where championship.id = ${championshipId}
-      GROUP by te.name, game.total, pointsRestrict.total, championship_keys.name, te.id
+      GROUP by te.name, game.total, pointsRestrict.total, te.id, ${
+        groupByKey ? 'championship_keys.name' : ''
+      }
       ORDER BY key ASC NULLS LAST
     `);
+
     tableGame = tableGame.map((game) => ({
       ...game,
       ...this.validateResultGame(game.id, tableGamesResults),
     }));
-    const keys = new Set(tableGame.map((game) => game.key));
-    tableGame = [...keys].flatMap((key) => {
-      const gameKeys = tableGame.filter((game) => game.key == key);
-      gameKeys
-        .sort((teamA, teamB) =>
-          parseInt(teamA.point) < parseInt(teamB.point) ? 1 : -1,
-        )
-        .sort((teamA, teamB) =>
-          parseInt(teamA.balancePoints) < parseInt(teamB.balancePoints)
-            ? 1
-            : -1,
-        );
-      return gameKeys;
-    });
+
+    if (groupByKey) {
+      const keys = new Set(tableGame.map((game) => game.key));
+      tableGame = [...keys].flatMap((key) => {
+        const gameKeys = tableGame.filter((game) => game.key == key);
+        return this.sortGames(gameKeys);
+      });
+    } else {
+      tableGame = this.sortGames(tableGame);
+    }
     return tableGame;
   }
 }
