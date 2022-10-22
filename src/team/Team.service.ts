@@ -145,15 +145,15 @@ export class TeamService {
 
   sortGames(arr) {
     return [
-      ...arr
-        .sort((teamA, teamB) =>
-          parseInt(teamA.point) < parseInt(teamB.point) ? 1 : -1,
-        )
-        .sort((teamA, teamB) =>
-          parseInt(teamA.balancePoints) < parseInt(teamB.balancePoints)
+      ...arr.sort((teamA, teamB) => {
+        if (parseInt(teamA.point) === parseInt(teamB.point)) {
+          return parseInt(teamA.balancePoints) < parseInt(teamB.balancePoints)
             ? 1
-            : -1,
-        ),
+            : -1;
+        } else {
+          return parseInt(teamA.point) < parseInt(teamB.point) ? 1 : -1;
+        }
+      }),
     ];
   }
 
@@ -164,7 +164,7 @@ export class TeamService {
     championshipId: string;
     groupByKey: boolean;
   }): Promise<tableGame> {
-    console.log(groupByKey)
+    console.log(groupByKey);
     const tableGamesResults = await this.connection.query(`
       SELECT stt."teamId", s.id as "sumulaId", SUM(COALESCE(sg.point, 0))
       from sumula s
