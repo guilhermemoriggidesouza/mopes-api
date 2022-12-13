@@ -9,4 +9,6 @@ export default {
   db_database: process.env.DATABASE_DB_MOPE,
   db_port: process.env.PORT_DB_MOPE,
   db_url: process.env.DATABASE_URL,
+  email: process.env.EMAIL,
+  passwordEmail: process.env.PASS_EMAIL,
 };

@@ -223,7 +223,6 @@ export class TeamService {
       ...team,
       ...this.validateResultGame(team.id, tableGamesResults),
     }));
-    console.log(tableGame);
     if (groupByKey) {
       const keys = new Set(tableGame.map((game) => game.key));
       tableGame = [...keys].flatMap((key) => {

@@ -26,6 +26,9 @@ export class User {
   @Column({ unique: true })
   login: string;
 
+  @Column({ unique: true, nullable: true })
+  email?: string;
+
   @Column({ default: '' })
   rg: string;
 
