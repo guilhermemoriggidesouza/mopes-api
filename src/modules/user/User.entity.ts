@@ -44,11 +44,6 @@ export class User {
   @Column({ default: 'player', nullable: true })
   role?: string;
 
-  @ManyToOne(() => Org, (user) => user.users)
-  org?: Org;
-  @Column({ nullable: true })
-  orgId?: number;
-
   @OneToMany(() => Team, (team) => team.creator)
   teamsCreated?: Team[];
 

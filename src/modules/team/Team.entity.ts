@@ -29,11 +29,9 @@ export class Team {
   @Column()
   creatorId: number;
 
-  @ManyToOne(() => Org)
-  org: Org;
-
-  @Column()
-  orgId: number;
+  @ManyToMany(() => Championship)
+  @JoinTable()
+  orgs: Org[];
 
   @ManyToMany(() => Championship)
   @JoinTable()

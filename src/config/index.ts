@@ -11,4 +11,10 @@ export default {
   db_url: process.env.DATABASE_URL,
   email: process.env.EMAIL,
   passwordEmail: process.env.PASS_EMAIL,
+  aws: {
+    region: process.env.REGION_AWS,
+    userKey: process.env.USER_KEY_AWS,
+    userSecret: process.env.USER_SECRET_AWS,
+    bucket: process.env.BUCKET_AWS,
+  },
 };

@@ -1,31 +1,38 @@
 import { Team } from 'src/modules/team/Team.entity';
 import { User } from 'src/modules/user/User.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 
 @Entity()
 export class Org {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name: string;
-    
-    @Column({nullable: true})
-    logo: string;
-    
-    @OneToOne(()=> User)
-    @JoinColumn()
-    owner: User;
+  @Column()
+  name: string;
 
-    @Column({nullable: true})
-    ownerId: number;
+  @Column({ nullable: true })
+  logo: string;
 
-    @OneToMany(() => User, user => user.org)
-    users: User[];
+  @OneToOne(() => User)
+  @JoinColumn()
+  owner: User;
 
-    @OneToMany(() => Team, team => team.org)
-    teams: Team[];
+  @Column({ nullable: true })
+  ownerId: number;
 
-    @Column({default: false})
-    payedIntegration: boolean;
+  @ManyToMany(() => Team)
+  @JoinTable()
+  teams: Team[];
+
+  @Column({ default: false })
+  payedIntegration: boolean;
 }

@@ -33,7 +33,6 @@ export class PlayerService {
           birthday: player.birthday,
           class: player.class,
           password: player.password,
-          orgId,
           teamId: player.teamId,
         });
         const playerInserted = await this.create({
