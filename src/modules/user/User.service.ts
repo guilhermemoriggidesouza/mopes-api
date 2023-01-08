@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './User.entity';
 import { PlayerService } from './../player/Player.service';
+import { Player } from '../player/Player.entity';
 
 @Injectable()
 export class UserService {
@@ -12,12 +13,12 @@ export class UserService {
     private readonly jwtService: JwtService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(User: User): Promise<User> {
-    const user = await this.userRepository.findOne({
+    let user = await this.userRepository.findOne({
       where: { login: User.login },
-    });
+    }), player: Player;
     if (user) {
       throw new BadRequestException(
         `Login for player {${User.login}} already exists`,
@@ -25,8 +26,9 @@ export class UserService {
     }
     const userInserted = await this.userRepository.save(User);
     if (User.role == 'player') {
-      this.playerService.create({ name: User.name, userId: userInserted.id });
+      player = await this.playerService.create({ name: User.name, userId: userInserted.id });
     }
+    this.userRepository.update(userInserted.id, { playerId: player?.id });
     return User;
   }
 

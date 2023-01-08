@@ -32,7 +32,7 @@ export class Player {
   userId?: number;
 
   @RelationId((player: Player) => player.team)
-  @Column()
+  @Column({ nullable: true })
   teamId?: number;
 
   @ManyToOne(() => Team, (team) => team.players)
