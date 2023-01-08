@@ -40,7 +40,6 @@ export class UserController {
   }
 
   @Post(`${urlBase}`)
-  @Roles(Role.Admin)
   async createUser(@Body() payload: User): Promise<User> {
     return await this.userService.create(payload);
   }

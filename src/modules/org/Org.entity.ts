@@ -7,8 +7,8 @@ import {
   OneToOne,
   OneToMany,
   JoinColumn,
-  ManyToMany,
   JoinTable,
+  ManyToMany,
 } from 'typeorm';
 
 @Entity()
@@ -28,6 +28,9 @@ export class Org {
 
   @Column({ nullable: true })
   ownerId: number;
+
+  @OneToMany(() => User, (user) => user.org)
+  users: User[];
 
   @ManyToMany(() => Team)
   @JoinTable()

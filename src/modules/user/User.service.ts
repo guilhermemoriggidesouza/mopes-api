@@ -3,13 +3,15 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './User.entity';
+import { PlayerService } from './../player/Player.service';
 
 @Injectable()
 export class UserService {
   constructor(
+    private playerService: PlayerService,
+    private readonly jwtService: JwtService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly jwtService: JwtService,
   ) {}
 
   async create(User: User): Promise<User> {
@@ -21,11 +23,11 @@ export class UserService {
         `Login for player {${User.login}} already exists`,
       );
     }
-    return this.userRepository.save(User);
-  }
-
-  async createMany(Users: User[], teamId): Promise<User[]> {
-    return Promise.all(Users.map(async (user) => this.create(user)));
+    const userInserted = await this.userRepository.save(User);
+    if (User.role == 'player') {
+      this.playerService.create({ name: User.name, userId: userInserted.id });
+    }
+    return User;
   }
 
   async findAll(): Promise<User[]> {

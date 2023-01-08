@@ -1,12 +1,8 @@
-import AWS from 'aws-sdk';
-import config from '../config';
+import AWS, { S3 } from 'aws-sdk';
+import configEnv from '../config';
 
-AWS.config.update({
-  region: 'us-west-2',
-});
-
-export default new AWS.S3({
-  accessKeyId: config.aws.userKey,
-  secretAccessKey: config.aws.userSecret,
-  region: config.aws.region,
+export default new S3({
+  accessKeyId: configEnv.aws.userKey,
+  secretAccessKey: configEnv.aws.userSecret,
+  region: configEnv.aws.region,
 });

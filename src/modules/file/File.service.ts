@@ -1,11 +1,8 @@
-import { BadGatewayException, Dependencies, Injectable } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import config from 'src/config';
 import s3 from 'src/infra/s3';
-import { Repository } from 'typeorm';
 
 @Injectable()
-@Dependencies(getRepositoryToken(File))
 export class FileService {
   async create(file: FileRequest): Promise<FileResponse> {
     try {
@@ -18,7 +15,8 @@ export class FileService {
         ...file,
       };
     } catch (error) {
-      throw new BadGatewayException('Error on create file url signed');
+      console.log(error);
+      throw new BadRequestException('Error on create file url signed');
     }
   }
 
@@ -33,7 +31,8 @@ export class FileService {
         ...file,
       };
     } catch (error) {
-      throw new BadGatewayException('Error on find file url signed');
+      console.log(error);
+      throw new BadRequestException('Error on find file url signed');
     }
   }
 
@@ -42,7 +41,8 @@ export class FileService {
       s3.deleteObject({ Bucket: config.aws.bucket, Key: fileName });
       return { success: true };
     } catch (error) {
-      throw new BadGatewayException('Error on find file url signed');
+      console.log(error);
+      throw new BadRequestException('Error on find file url signed');
     }
   }
 }
