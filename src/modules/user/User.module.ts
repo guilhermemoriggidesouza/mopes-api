@@ -5,9 +5,11 @@ import { UserService } from './User.service';
 import { User } from './User.entity';
 import { JwtModule } from '@nestjs/jwt';
 import config from 'src/config';
+import { PlayerModule } from '../player/Player.module';
 
 @Module({
   imports: [
+    PlayerModule,
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
       secret: config.secret_key,

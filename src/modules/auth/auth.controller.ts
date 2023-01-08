@@ -11,15 +11,23 @@ import {
 } from '@nestjs/common';
 import { User } from 'src/modules/user/User.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-const urlBase: string = '/auth';
+import { UserService } from '../user/User.service';
+const urlBase = '/auth';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
   @Post(`${urlBase}/login`)
   async login(@Body() payload: login): Promise<User> {
     return await this.authService.login(payload.login, payload.password);
+  }
+  @Post(`${urlBase}/sign`)
+  async sign(@Body() payload: any): Promise<User> {
+    return await this.userService.create(payload);
   }
 
   @Post(`${urlBase}/recover-password`)

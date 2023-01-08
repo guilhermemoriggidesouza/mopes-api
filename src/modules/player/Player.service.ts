@@ -1,13 +1,6 @@
-import {
-  BadRequestException,
-  Dependencies,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
-import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
-import { UserService } from 'src/modules/user/User.service';
-import { In, IsNull, Not, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Player } from './Player.entity';
 
 @Injectable()
@@ -15,37 +8,10 @@ export class PlayerService {
   constructor(
     @InjectRepository(Player)
     private readonly playerRepository: Repository<Player>,
-    private readonly userService: UserService,
   ) {}
 
   async create(player: Player): Promise<Player> {
     return this.playerRepository.save(player);
-  }
-
-  async createMany(players: any[], orgId: number, teamId: number) {
-    const playersInsert = players.map(async (player) => {
-      if (!player.id) {
-        const user = await this.userService.create({
-          name: player.name,
-          login: player.login,
-          ra: player.ra,
-          rg: player.rg,
-          birthday: player.birthday,
-          class: player.class,
-          password: player.password,
-          teamId: player.teamId,
-        });
-        const playerInserted = await this.create({
-          name: player.name,
-          teamId: player.teamId,
-          userId: user.id,
-        });
-        return this.userService.edit(user.id.toString(), {
-          playerId: playerInserted.id,
-        });
-      }
-    });
-    return await Promise.all(playersInsert);
   }
 
   async findAll(): Promise<Player[]> {

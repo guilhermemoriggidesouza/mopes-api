@@ -19,6 +19,7 @@ import { PlayerModule } from './modules/player/Player.module';
 import { CategoryGame } from './modules/categoryGame/CategoryGame.entity';
 import { ChampionshipModule } from './modules/championship/Championship.module';
 import { ChampionshipKeys } from './modules/championship/entities/ChampionshipKeys.entity';
+import { FileModule } from './modules/file/File.module';
 
 @Module({
   imports: [
@@ -39,14 +40,15 @@ import { ChampionshipKeys } from './modules/championship/entities/ChampionshipKe
       ],
       synchronize: true,
     }),
-    UserModule,
     PlayerModule,
+    UserModule,
     AuthModule,
     TeamModule,
     OrgModule,
     SumulaModule,
     ChampionshipModule,
     CategoryGameModule,
+    FileModule,
   ],
 })
 export class AppModule {}

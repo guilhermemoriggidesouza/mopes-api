@@ -1,13 +1,9 @@
 import { UserService } from 'src/modules/user/User.service';
 import { PlayerService } from './../player/Player.service';
-import { Player } from '../player/Player.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { Team } from './Team.entity';
-import { User } from 'src/modules/user/User.entity';
-import { Championship } from 'src/modules/championship/entities/Championship.entity';
-import { table } from 'console';
 
 @Injectable()
 export class TeamService {
@@ -41,63 +37,7 @@ export class TeamService {
   }
 
   async edit(id: string, payload: any, orgId: number): Promise<any> {
-    await this.savePlayers({
-      players: payload.players,
-      teamId: parseInt(id),
-      orgId,
-    });
-    await this.saveCoachs({
-      coachs: payload.coachs,
-      teamId: parseInt(id),
-      orgId,
-    });
-    delete payload.players;
-    delete payload.coachs;
     return await this.teamRepository.update(id, payload);
-  }
-
-  async savePlayers({
-    players,
-    teamId,
-    orgId,
-  }: {
-    players: Player[];
-    teamId: number;
-    orgId: number;
-  }) {
-    if (players && teamId) {
-      players = players.map((player) => ({
-        ...player,
-        teamId,
-      }));
-      await this.playerService.createMany(players, orgId, teamId);
-    }
-  }
-
-  async saveCoachs({
-    coachs,
-    teamId,
-    orgId,
-  }: {
-    coachs: User[];
-    teamId: number;
-    orgId: number;
-  }) {
-    if (coachs && teamId) {
-      coachs = coachs
-        .map((coach) => ({
-          ...coach,
-          teamId,
-          orgId,
-          role: 'coach',
-        }))
-        .filter((coach) => !coach.id);
-      await this.userService.createMany(coachs, teamId);
-    }
-  }
-
-  async generatePoints(id: string) {
-    await this.connection.query(``);
   }
 
   allEqual(arr) {
