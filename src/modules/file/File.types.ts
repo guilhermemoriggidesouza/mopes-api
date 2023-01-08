@@ -1,5 +1,6 @@
 type FileRequest = {
   fileName: string;
+  contentType?: string;
 };
 
 type FileResponse = {

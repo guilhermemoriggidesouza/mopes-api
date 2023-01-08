@@ -8,6 +8,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   Request,
   UseGuards,
@@ -18,11 +19,11 @@ const urlBase = '/file';
 
 @Controller()
 export class FileController {
-  constructor(private readonly fileService: FileService) {}
+  constructor(private readonly fileService: FileService) { }
 
   @Get(`${urlBase}/:fileName`)
   async findOne(@Param('fileName') fileName: string): Promise<FileResponse> {
-    return await this.fileService.find({ fileName });
+    return await this.fileService.find({ fileName: decodeURIComponent(fileName) });
   }
 
   @Post(`${urlBase}`)
@@ -32,6 +33,6 @@ export class FileController {
 
   @Delete(`${urlBase}/:fileName`)
   async removeFile(@Param('fileName') fileName: string): Promise<any> {
-    return await this.fileService.remove(fileName);
+    return await this.fileService.remove(decodeURIComponent(fileName));
   }
 }

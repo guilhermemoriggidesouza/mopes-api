@@ -9,6 +9,7 @@ export class FileService {
       const signedUrl = s3.getSignedUrl('putObject', {
         Bucket: config.aws.bucket,
         Key: file.fileName,
+        ContentType: file.contentType
       });
       return {
         url: signedUrl,
