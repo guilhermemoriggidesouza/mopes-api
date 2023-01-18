@@ -39,7 +39,11 @@ export class FileService {
 
   async remove(fileName: string): Promise<any> {
     try {
-      s3.deleteObject({ Bucket: config.aws.bucket, Key: fileName });
+      console.log(fileName)
+      s3.deleteObject({ Bucket: config.aws.bucket, Key: fileName }, (err, data) => {
+        if (err) throw new Error(err.message)
+        console.log(err, data, config.aws.bucket)
+      });
       return { success: true };
     } catch (error) {
       console.log(error);
