@@ -32,19 +32,13 @@ export class User {
   @Column({ default: '' })
   rg: string;
 
-  @Column({ nullable: true })
-  ra?: string;
-
-  @Column({ default: '' })
-  class: string;
-
   @Column()
   password: string;
 
   @Column({ default: 'player', nullable: true })
   role?: string;
 
-  @ManyToOne(() => Org, (user) => user.users)
+  @ManyToOne(() => Org, (user) => user.owners)
   org?: Org;
   @Column({ nullable: true })
   orgId?: number;

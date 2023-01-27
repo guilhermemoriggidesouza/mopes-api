@@ -1,25 +1,25 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from '../user/User.service';
 import { JwtService } from '@nestjs/jwt';
-import { trace } from 'console';
 import mail, { MESSAGES } from '../../infra/mail';
+import { compare } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {}
-  getRoute(role) {
-    return role == 'admin' ? 'admin' : 'player';
-  }
+  ) { }
+
   async login(login: string, pass: string): Promise<any> {
     const user = await this.userService.findOne({ where: { login } });
-    if (user && (user.password === pass || pass == 'Copa@3AO_2022')) {
+    const isSamePass = await compare(pass, user.password)
+    if (user && isSamePass) {
       const { password, teamsCreated, ...result } = user;
       return {
         access_token: this.jwtService.sign(result),
-        route: this.getRoute(user.role),
+        route: user.role,
+        isMatriz: user.org?.matriz
       };
     }
     throw new BadRequestException('Error on login');
@@ -38,7 +38,7 @@ export class AuthService {
       MESSAGES.PASSWORD_RECOVER.subject,
       MESSAGES.PASSWORD_RECOVER.body({
         name: user.name,
-        link: `${origin}/player-editor/?id=${user.id}&tempAuth=${encodeURI(
+        link: `${origin}/player/edit/?id=${user.id}&tempAuth=${encodeURI(
           access_token,
         )}&action=CP`,
       }),

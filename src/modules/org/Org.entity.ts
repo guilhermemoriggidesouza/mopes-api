@@ -10,6 +10,7 @@ import {
   JoinTable,
   ManyToMany,
 } from 'typeorm';
+import { Championship } from '../championship/entities/Championship.entity';
 
 @Entity()
 export class Org {
@@ -22,20 +23,20 @@ export class Org {
   @Column({ nullable: true })
   logo: string;
 
-  @OneToOne(() => User)
-  @JoinColumn()
-  owner: User;
-
-  @Column({ nullable: true })
-  ownerId: number;
-
   @OneToMany(() => User, (user) => user.org)
-  users: User[];
+  owners: User[];
+
+  @OneToMany(() => Championship, (champ) => champ.org)
+  championships: Championship;
 
   @ManyToMany(() => Team)
   @JoinTable()
   teams: Team[];
 
+  @Column({ nullable: true, default: 0.0 })
+  valuePayed?: number;
+
   @Column({ default: false })
-  payedIntegration: boolean;
+  matriz: boolean;
+
 }

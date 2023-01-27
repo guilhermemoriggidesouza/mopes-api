@@ -20,7 +20,7 @@ export class TeamService {
   }
 
   async findAll(where?: any): Promise<Team[]> {
-    return this.teamRepository.find({ where, relations: ['championships'] });
+    return this.teamRepository.find({ where, relations: ['championships', 'orgs'] });
   }
 
   async findOne({ id, where }: { id?: string; where?: any }): Promise<Team> {

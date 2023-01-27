@@ -1,5 +1,6 @@
 import { Championship } from '../championship/entities/Championship.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Team } from '../team/Team.entity';
 
 @Entity()
 export class CategoryGame {
@@ -29,4 +30,7 @@ export class CategoryGame {
 
   @OneToMany(() => Championship, (champ) => champ.category)
   championships: Championship[];
+
+  @OneToMany(() => Championship, (champ) => champ.category)
+  teams: Team[];
 }

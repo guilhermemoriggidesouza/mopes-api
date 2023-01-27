@@ -21,7 +21,7 @@ export class OrgService {
     }
 
     async findOne({ id, where }: { id?: string, where?: object }): Promise<Org> {
-        return this.orgRepository.findOne(id, { where, relations: ['users', "owner"] });
+        return this.orgRepository.findOne(id, { where, relations: ["teams", "championships"] });
     }
 
     async remove(id: string): Promise<object> {

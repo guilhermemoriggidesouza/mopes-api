@@ -20,7 +20,7 @@ const urlBase = '/org';
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class OrgController {
-  constructor(private readonly orgService: OrgService) {}
+  constructor(private readonly orgService: OrgService) { }
 
   @Get(`${urlBase}`)
   @Roles(Role.Admin)
@@ -28,10 +28,10 @@ export class OrgController {
     return await this.orgService.findAll();
   }
 
-  @Get(`${urlBase}/:id`)
+  @Get(`${urlBase}/my`)
   @Roles(Role.Admin)
-  async findOne(@Param('id') id: string): Promise<Org> {
-    return await this.orgService.findOne({ id });
+  async findOneMy(@Request() req: any): Promise<Org> {
+    return await this.orgService.findOne({ id: req.user.id });
   }
 
   @Post(`${urlBase}`)

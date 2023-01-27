@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from './User.entity';
 import { PlayerService } from './../player/Player.service';
 import { Player } from '../player/Player.entity';
+import { hash, genSalt } from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -15,21 +16,24 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) { }
 
-  async create(User: User): Promise<User> {
+  async create(UserRequest: User): Promise<User> {
     let user = await this.userRepository.findOne({
-      where: { login: User.login },
+      where: [{ login: UserRequest.login }, { email: UserRequest.email }],
     }), player: Player;
+
     if (user) {
+      const type = user.login == UserRequest.login ? 'login' : 'email'
       throw new BadRequestException(
-        `Login for player {${User.login}} already exists`,
+        `{{${type}}} for player {{${UserRequest.name}} already exists`,
       );
     }
-    const userInserted = await this.userRepository.save(User);
-    if (User.role == 'player') {
-      player = await this.playerService.create({ name: User.name, userId: userInserted.id });
+    UserRequest.password = await hash(UserRequest.password, (await genSalt()));
+    const userInserted = await this.userRepository.save(UserRequest);
+    if (UserRequest.role == 'player') {
+      player = await this.playerService.create({ name: UserRequest.name, userId: userInserted.id });
     }
     this.userRepository.update(userInserted.id, { playerId: player?.id });
-    return User;
+    return UserRequest;
   }
 
   async findAll(): Promise<User[]> {
@@ -48,6 +52,9 @@ export class UserService {
   }
 
   async edit(id: string, payload: any): Promise<any> {
+    if (payload.password) {
+      payload.password = await hash(payload.password, (await genSalt()));
+    }
     return await this.userRepository.update(id, payload);
   }
 

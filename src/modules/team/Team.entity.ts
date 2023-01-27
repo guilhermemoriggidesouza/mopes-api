@@ -14,14 +14,21 @@ import {
   JoinTable,
   ManyToMany,
 } from 'typeorm';
+import { CategoryGame } from '../categoryGame/CategoryGame.entity';
 
 @Entity()
 export class Team {
   @PrimaryGeneratedColumn()
   id?: number;
 
-  @Column({ nullable: true })
+  @Column()
   name: string;
+
+  @Column()
+  sex: string;
+
+  @Column({ default: '' })
+  city: string;
 
   @ManyToOne(() => User)
   creator: User;
@@ -29,9 +36,15 @@ export class Team {
   @Column()
   creatorId: number;
 
-  @ManyToMany(() => Championship)
+  @ManyToMany(() => Org)
   @JoinTable()
   orgs: Org[];
+
+  @ManyToOne(() => CategoryGame)
+  category: CategoryGame;
+
+  @Column({ nullable: true })
+  categoryId: number;
 
   @ManyToMany(() => Championship)
   @JoinTable()
@@ -39,9 +52,6 @@ export class Team {
 
   @OneToMany(() => User, (user) => user.team)
   coachs: User[];
-
-  @Column({ default: '' })
-  city: string;
 
   @Column({ default: false })
   payedIntegration: boolean;

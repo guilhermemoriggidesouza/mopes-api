@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import { Sumula } from 'src/modules/sumula/entities/Sumula.entity';
 import { ChampionshipKeys } from './ChampionshipKeys.entity';
+import { Org } from 'src/modules/org/Org.entity';
 
 @Entity()
 export class Championship {
@@ -31,6 +32,12 @@ export class Championship {
 
   @Column({ nullable: true })
   ownerId?: number;
+
+  @ManyToOne(() => Org)
+  org?: Org;
+
+  @Column({ nullable: true })
+  orgId?: number;
 
   @ManyToMany(() => Team)
   @JoinTable()

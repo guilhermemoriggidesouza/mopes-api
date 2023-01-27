@@ -27,7 +27,7 @@ export class TeamController {
   @Get(`${urlBase}`)
   @Roles(Role.Admin)
   async findAllTeams(@Request() req: any): Promise<Team[]> {
-    return await this.teamService.findAll({ orgId: req.user.orgId });
+    return await this.teamService.findAll();
   }
 
   @Get(`${urlBase}/:id`)

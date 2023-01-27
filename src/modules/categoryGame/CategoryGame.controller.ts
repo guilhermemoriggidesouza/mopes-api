@@ -15,7 +15,7 @@ import {
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { CategoryGame } from './CategoryGame.entity';
 import { CategoryGameService } from './CategoryGame.service';
-const urlBase = '/CategoryGame';
+const urlBase = '/categoryGame';
 
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
