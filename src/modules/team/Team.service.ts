@@ -4,19 +4,25 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { Team } from './Team.entity';
+import { OrgService } from '../org/Org.service';
 
 @Injectable()
 export class TeamService {
   constructor(
     private playerService: PlayerService,
     private userService: UserService,
+    private orgService: OrgService,
     @InjectRepository(Team)
     private teamRepository: Repository<Team>,
     @InjectConnection() private readonly connection: Connection,
-  ) {}
+  ) { }
 
   async create(Team: Team, creatorId: number, orgId: number): Promise<Team> {
-    return this.teamRepository.save({ ...Team, creatorId, orgId });
+    if (orgId) {
+      const org = await this.orgService.findOne({ id: orgId.toString() })
+      Team.orgs = [org]
+    }
+    return this.teamRepository.save({ ...Team, creatorId });
   }
 
   async findAll(where?: any): Promise<Team[]> {
@@ -147,14 +153,12 @@ export class TeamService {
       LEFT JOIN sumula ON sumula_teams_team."sumulaId" = sumula.id
       LEFT JOIN status_game ON status_game."sumulaId" = sumula.id and status_game."teamId" = te.id
       LEFT JOIN championship ON championship.id = sumula."championshipId"
-      ${
-        groupByKey
-          ? `LEFT JOIN championship_keys ON championship_keys.id = sumula."championshipKeysId"`
-          : ''
+      ${groupByKey
+        ? `LEFT JOIN championship_keys ON championship_keys.id = sumula."championshipKeysId"`
+        : ''
       }
       where championship.id = ${championshipId}
-      GROUP by te.name, game.total, pointsRestrict.total, te.id${
-        groupByKey ? ', championship_keys.name' : ''
+      GROUP by te.name, game.total, pointsRestrict.total, te.id${groupByKey ? ', championship_keys.name' : ''
       }
       ${groupByKey ? 'ORDER BY key ASC NULLS LAST' : ''}
     `);

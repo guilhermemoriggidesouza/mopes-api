@@ -29,8 +29,7 @@ export class Org {
   @OneToMany(() => Championship, (champ) => champ.org)
   championships: Championship;
 
-  @ManyToMany(() => Team)
-  @JoinTable()
+  @ManyToMany(() => Team, (team) => team.orgs)
   teams: Team[];
 
   @Column({ nullable: true, default: 0.0 })

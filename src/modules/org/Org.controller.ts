@@ -31,7 +31,7 @@ export class OrgController {
   @Get(`${urlBase}/my`)
   @Roles(Role.Admin)
   async findOneMy(@Request() req: any): Promise<Org> {
-    return await this.orgService.findOne({ id: req.user.id });
+    return await this.orgService.findOne({ id: req.user.orgId });
   }
 
   @Post(`${urlBase}`)

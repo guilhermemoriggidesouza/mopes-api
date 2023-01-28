@@ -36,7 +36,7 @@ export class Team {
   @Column()
   creatorId: number;
 
-  @ManyToMany(() => Org)
+  @ManyToMany(() => Org, (org) => org.teams)
   @JoinTable()
   orgs: Org[];
 
