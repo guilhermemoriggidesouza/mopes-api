@@ -28,9 +28,8 @@ const urlBase = '/sumula';
 export class SumulaController {
   constructor(
     private readonly sumulaService: SumulaService,
-    private readonly playerService: PlayerService,
     private readonly sumulaGateway: SumulaGateway,
-  ) {}
+  ) { }
 
   @Get(`${urlBase}`)
   @Roles(Role.Admin)
@@ -97,8 +96,9 @@ export class SumulaController {
       payload,
     );
     if (payload.makePerpetue && payload.playerId) {
-      await this.playerService.addingFault(
+      await this.sumulaService.addingFault(
         payload.playerId,
+        parseInt(id),
         payload.data.fault,
       );
     }

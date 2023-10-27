@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   Request,
   UseGuards,
@@ -21,7 +22,7 @@ const urlBase = '/player';
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class PlayerController {
-  constructor(private readonly playerService: PlayerService) {}
+  constructor(private readonly playerService: PlayerService) { }
 
   @Get(`${urlBase}`)
   @Roles(Role.Coach, Role.Admin)
@@ -49,4 +50,13 @@ export class PlayerController {
   async removePlayer(@Param('id') id: string): Promise<any> {
     return await this.playerService.remove({ id });
   }
+
+  @Put(`${urlBase}/:id/insert-team/:teamId`)
+  @Roles(Role.Player, Role.Admin)
+  async insetPlayerTeam(@Param('id') id: string, @Param('teamId') teamId: string,
+  ): Promise<any> {
+    return await this.playerService.addTeam({ id, teamId });
+  }
+
+
 }

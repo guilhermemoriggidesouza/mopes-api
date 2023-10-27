@@ -34,7 +34,7 @@ export class SumulaService {
     private readonly teamsService: TeamService,
     private readonly championshipService: ChampionshipService,
     @InjectConnection() private readonly connection: Connection,
-  ) {}
+  ) { }
 
   async create(sumula: Sumula): Promise<Sumula> {
     return this.sumulaRepository.save({ ...sumula });
@@ -160,7 +160,7 @@ export class SumulaService {
 
     if (
       statusPerPlayer.faults %
-        sumula.championship.category.maxFaultsPerPlayer ==
+      sumula.championship.category.maxFaultsPerPlayer ==
       0
     ) {
       messages.push({
@@ -286,13 +286,19 @@ export class SumulaService {
       throw new BadRequestException('PLAYERNOTINTEAM');
     }
     const player = await this.playerService.findOne({ id: payload.playerId });
-    if (player.infractions >= category.maxInfractionPerPlayer) {
+    if (playerInMatch.infractions >= category.maxInfractionPerPlayer) {
       throw new BadRequestException('MAXINFRACTIONS');
     }
+    const playerTeamsIds = player.teams.map(t => t.id)
+    const teamId = teams.map(t => t.id).find(team => playerTeamsIds.includes(team))
     await this.playerInMatchRepository.save({
       sumulaId: parseInt(id),
-      teamId: player.teamId,
+      teamId: teamId,
       playerId: player.id,
     });
+  }
+
+  async addingFault(playerId: number, sumulaId: number, fault: number): Promise<any> {
+    return await this.playerInMatchRepository.increment({ sumulaId, playerId }, 'infractions', fault);
   }
 }

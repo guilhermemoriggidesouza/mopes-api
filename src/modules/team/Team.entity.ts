@@ -36,32 +36,35 @@ export class Team {
   @Column()
   creatorId: number;
 
-  @ManyToMany(() => Org, (org) => org.teams)
-  @JoinTable()
-  orgs: Org[];
-
-  @ManyToOne(() => CategoryGame)
-  category: CategoryGame;
-
-  @Column({ nullable: true })
-  categoryId: number;
-
-  @ManyToMany(() => Championship)
-  @JoinTable()
-  championships: Championship[];
-
-  @OneToMany(() => User, (user) => user.team)
-  coachs: User[];
-
   @Column({ default: false })
   payedIntegration: boolean;
 
   @Column({ nullable: true })
   key: string;
 
-  @OneToMany(() => Player, (player) => player.team)
-  players: Player[];
+  @Column({ nullable: true })
+  categoryId: number;
+
+  @ManyToOne(() => CategoryGame)
+  category: CategoryGame;
 
   @OneToMany(() => StatusGame, (SGP) => SGP.team)
   statusGame?: StatusGame[];
+
+  @ManyToMany(() => Org, (org) => org.teams)
+  @JoinTable()
+  orgs: Org[];
+
+  @ManyToMany(() => Championship)
+  @JoinTable()
+  championships: Championship[];
+
+  @ManyToMany(() => Player)
+  @JoinTable()
+  players: Player[];
+
+  @ManyToMany(() => Player)
+  @JoinTable({ name: "coachs" })
+  coachs?: Player[];
+
 }

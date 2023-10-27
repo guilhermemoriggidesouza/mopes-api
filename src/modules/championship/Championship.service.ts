@@ -25,7 +25,6 @@ export class ChampionshipService {
 
     @Inject(forwardRef(() => SumulaService))
     private readonly sumulasService: SumulaService,
-    private readonly teamsService: TeamService,
   ) {}
 
   getNameKey(index): string {

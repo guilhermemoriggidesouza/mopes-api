@@ -38,7 +38,7 @@ export class AuthService {
       MESSAGES.PASSWORD_RECOVER.subject,
       MESSAGES.PASSWORD_RECOVER.body({
         name: user.name,
-        link: `${origin}/player/edit/?id=${user.id}&tempAuth=${encodeURI(
+        link: `${origin}/recover-password/?id=${user.id}&tempAuth=${encodeURI(
           access_token,
         )}&action=CP`,
       }),

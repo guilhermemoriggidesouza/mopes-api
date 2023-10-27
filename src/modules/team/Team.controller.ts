@@ -22,16 +22,16 @@ const urlBase = '/team';
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class TeamController {
-  constructor(private readonly teamService: TeamService) {}
+  constructor(private readonly teamService: TeamService) { }
 
   @Get(`${urlBase}`)
   @Roles(Role.Admin)
   async findAllTeams(@Request() req: any): Promise<Team[]> {
-    return await this.teamService.findAll();
+    return await this.teamService.findAll({ where: { orgs: [req.user.orgId] } });
   }
 
   @Get(`${urlBase}/:id`)
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Player)
   async findOne(@Param('id') id: string): Promise<Team> {
     return await this.teamService.findOne({ id });
   }

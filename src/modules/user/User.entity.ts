@@ -49,11 +49,6 @@ export class User {
   @OneToMany(() => Championship, (champ) => champ.owner)
   championshipsOwner?: Championship[];
 
-  @ManyToOne(() => Team, (team) => team.coachs)
-  team?: Team;
-  @Column({ nullable: true })
-  teamId?: number;
-
   @OneToOne(() => Player, (player) => player.user)
   player?: Player;
   @Column({ nullable: true })

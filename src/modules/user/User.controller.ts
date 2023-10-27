@@ -45,8 +45,7 @@ export class UserController {
   }
 
   @Put(`${urlBase}/:id`)
-  @Roles(Role.Player)
-  @Roles(Role.Admin)
+  @Roles(Role.Player, Role.Admin)
   async editUsers(
     @Param('id') id: string,
     @Body() payload: User,

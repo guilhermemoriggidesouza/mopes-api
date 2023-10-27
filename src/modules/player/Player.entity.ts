@@ -11,6 +11,8 @@ import {
   ManyToOne,
   RelationId,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity()
@@ -21,9 +23,6 @@ export class Player {
   @Column()
   name: string;
 
-  @Column({ nullable: true, default: 0 })
-  infractions?: number;
-
   @OneToOne(() => User, (user) => user.player)
   @JoinColumn()
   user?: User;
@@ -31,12 +30,9 @@ export class Player {
   @Column({ nullable: true })
   userId?: number;
 
-  @RelationId((player: Player) => player.team)
-  @Column({ nullable: true })
-  teamId?: number;
-
-  @ManyToOne(() => Team, (team) => team.players)
-  team?: Team;
+  @ManyToMany(() => Team)
+  @JoinTable()
+  teams?: Team[];
 
   @OneToMany(() => PlayerInMatch, (PIM) => PIM.player)
   playerInMatch?: PlayerInMatch[];

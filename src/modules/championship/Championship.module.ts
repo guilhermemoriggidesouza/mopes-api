@@ -9,7 +9,6 @@ import { TeamModule } from 'src/modules/team/Team.module';
 
 @Module({
   imports: [
-    TeamModule,
     TypeOrmModule.forFeature([Championship, ChampionshipKeys]),
     forwardRef(() => SumulaModule),
   ],

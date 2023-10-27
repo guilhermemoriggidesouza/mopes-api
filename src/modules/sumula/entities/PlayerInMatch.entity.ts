@@ -30,6 +30,9 @@ export class PlayerInMatch {
   @Column()
   playerId: number;
 
+  @Column()
+  infractions: number;
+
   @OneToMany(() => StatusGame, (SGP) => SGP.playerInMatch)
   statusGame: StatusGame[];
 }

@@ -1,5 +1,3 @@
-import { UserService } from 'src/modules/user/User.service';
-import { PlayerService } from './../player/Player.service';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
@@ -9,8 +7,6 @@ import { OrgService } from '../org/Org.service';
 @Injectable()
 export class TeamService {
   constructor(
-    private playerService: PlayerService,
-    private userService: UserService,
     private orgService: OrgService,
     @InjectRepository(Team)
     private teamRepository: Repository<Team>,
@@ -29,16 +25,20 @@ export class TeamService {
     return this.teamRepository.find({ where, relations: ['championships', 'orgs'] });
   }
 
-  async findOne({ id, where }: { id?: string; where?: any }): Promise<Team> {
+  async findOne({ id, where, withoutRelations = false }: { id?: string; where?: any, withoutRelations?: Boolean }): Promise<Team> {
     return this.teamRepository.findOne(id, {
       where,
-      relations: ['players', 'players.user', 'coachs'],
+      relations: !withoutRelations ? ['players', 'coachs'] : undefined,
     });
   }
 
   async remove(id: string): Promise<any> {
-    await this.playerService.remove({ where: { teamId: id } });
-    await this.userService.remove({ where: { teamId: id } });
+    const team: Team = await this.teamRepository.findOne({ where: { id } })
+    team.players = [];
+    team.orgs = []
+    team.championships = []
+    team.coachs = []
+    await this.teamRepository.save(team)
     return await this.teamRepository.delete(id);
   }
 
