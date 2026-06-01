@@ -3,6 +3,7 @@ import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { Team } from './Team.entity';
 import { OrgService } from '../org/Org.service';
+import { Role } from 'src/infra/role.enum';
 
 @Injectable()
 export class TeamService {
@@ -23,6 +24,27 @@ export class TeamService {
 
   async findAll(where?: any): Promise<Team[]> {
     return this.teamRepository.find({ where, relations: ['championships', 'orgs'] });
+  }
+
+  async findByUserRole(userId: string, role: Role, orgId?: number): Promise<Team[]> {
+    const query = this.teamRepository
+      .createQueryBuilder('team')
+      .leftJoinAndSelect('team.orgs', 'orgs')
+      .leftJoinAndSelect('team.championships', 'championships');
+
+    if (role === Role.Player) {
+      query.leftJoinAndSelect('team.players', 'player').where('player.id = :userId', { userId });
+    } else if (role === Role.Coach) {
+      query.leftJoinAndSelect('team.coachs', 'coach').where('coach.id = :userId', { userId });
+    } else {
+      return [];
+    }
+
+    if (orgId) {
+      query.andWhere('orgs.id = :orgId', { orgId });
+    }
+
+    return query.getMany();
   }
 
   async findOne({ id, where, withoutRelations = false }: { id?: string; where?: any, withoutRelations?: Boolean }): Promise<Team> {

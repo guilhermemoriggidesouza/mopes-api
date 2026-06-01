@@ -1,15 +1,13 @@
 import {
-  Dependencies,
   Injectable,
   BadRequestException,
   forwardRef,
   Inject,
 } from '@nestjs/common';
-import { getRepositoryToken, InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { SumulaService } from 'src/modules/sumula/Sumula.service';
 import { Team } from 'src/modules/team/Team.entity';
-import { TeamService } from 'src/modules/team/Team.service';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Championship } from './entities/Championship.entity';
 import { ChampionshipKeys } from './entities/ChampionshipKeys.entity';
 import { NAME_KEYS } from './_nameKeys';

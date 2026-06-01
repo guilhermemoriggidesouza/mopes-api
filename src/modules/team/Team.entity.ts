@@ -63,8 +63,8 @@ export class Team {
   @JoinTable()
   players: Player[];
 
-  @ManyToMany(() => Player)
+  @ManyToMany(() => User)
   @JoinTable({ name: "coachs" })
-  coachs?: Player[];
+  coachs?: User[];
 
 }

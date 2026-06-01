@@ -28,13 +28,13 @@ export class UserController {
   }
 
   @Get(`${urlBase}/:id`)
-  @Roles(Role.Player, Role.Admin)
+  @Roles(Role.Player, Role.Admin, Role.Coach)
   async findOne(@Param('id') id: string): Promise<User> {
     return await this.userService.findOne({ id });
   }
 
   @Get(`${urlBase}/:id/login/link`)
-  @Roles(Role.Player, Role.Admin)
+  @Roles(Role.Player, Role.Admin, Role.Coach)
   async findOneLink(@Param('id') id: string): Promise<User> {
     return await this.userService.getLoginLink(id);
   }
@@ -45,7 +45,7 @@ export class UserController {
   }
 
   @Put(`${urlBase}/:id`)
-  @Roles(Role.Player, Role.Admin)
+  @Roles(Role.Player, Role.Admin, Role.Coach)
   async editUsers(
     @Param('id') id: string,
     @Body() payload: User,

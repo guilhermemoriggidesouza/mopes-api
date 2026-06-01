@@ -25,13 +25,21 @@ export class TeamController {
   constructor(private readonly teamService: TeamService) { }
 
   @Get(`${urlBase}`)
-  @Roles(Role.Admin)
-  async findAllTeams(@Request() req: any): Promise<Team[]> {
+  @Roles(Role.Admin, Role.Player, Role.Coach)
+  async findAllTeams(
+    @Request() req: any,
+    @Query('userId') userId?: string,
+    @Query('role') role?: string,
+  ): Promise<Team[]> {
+    if (userId && role) {
+      return await this.teamService.findByUserRole(userId, role as Role, req.user.orgId);
+    }
+
     return await this.teamService.findAll({ where: { orgs: [req.user.orgId] } });
   }
 
   @Get(`${urlBase}/:id`)
-  @Roles(Role.Admin, Role.Player)
+  @Roles(Role.Admin, Role.Player, Role.Coach)
   async findOne(@Param('id') id: string): Promise<Team> {
     return await this.teamService.findOne({ id });
   }

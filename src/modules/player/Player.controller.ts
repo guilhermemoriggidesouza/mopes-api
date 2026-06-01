@@ -36,6 +36,14 @@ export class PlayerController {
     return await this.playerService.findOne({ id });
   }
 
+  @Get(`${urlBase}/:id/games`)
+  @Roles(Role.Player, Role.Coach, Role.Admin)
+  async findPlayedGames(
+    @Param('id') id: string,
+  ): Promise<{ games: any[]; gols: number }> {
+    return await this.playerService.getPlayedGamesAndGoals(id);
+  }
+
   @Put(`${urlBase}/:id`)
   @Roles(Role.Player, Role.Coach, Role.Admin)
   async editPlayers(
