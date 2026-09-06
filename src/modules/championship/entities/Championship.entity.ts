@@ -52,8 +52,13 @@ export class Championship {
   @Column({ nullable: true })
   categoryId: number;
 
+  // quantos times passam (se classificam) de cada chave para o mata-mata
   @Column({ default: 0 })
   gamePerKeys: number;
+
+  // quantas chaves (grupos) o campeonato tera na fase de grupos
+  @Column({ default: 0 })
+  keyNumber: number;
 
   @Column({ default: false })
   started: boolean;

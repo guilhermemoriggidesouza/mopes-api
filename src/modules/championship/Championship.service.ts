@@ -97,17 +97,14 @@ export class ChampionshipService {
   }
 
   async create(championship: any, ownerId: number): Promise<any> {
-    const { keys, blankGames, gamePerKeys, ...rest } = championship;
-    const championshipGen = await this.championshipRepository.save({
+    const { keys, blankGames, gamePerKeys, keyNumber, ...rest } = championship;
+    // as chaves e jogos so sao gerados no startChampionship, quando ja
+    // sabemos quais times estao inscritos.
+    return this.championshipRepository.save({
       ...rest,
       gamePerKeys: parseInt(gamePerKeys) || 0,
+      keyNumber: parseInt(keyNumber) || 0,
       ownerId,
-    });
-    await this.generateGames({
-      keys: parseInt(keys) || 0,
-      gamePerKeys: parseInt(gamePerKeys) || 0,
-      blankGames: parseInt(blankGames) || 0,
-      championshipId: championshipGen.id,
     });
   }
 
@@ -163,50 +160,17 @@ export class ChampionshipService {
   }
 
   async edit(id: string, payload: any): Promise<any> {
-    const championshipId = parseInt(id);
-    const { keys, gamePerKeys, blankGames, ...rest } = payload;
-
-    const current = await this.championshipRepository.findOne(id, {
-      relations: ['championshipKeys'],
-    });
-    if (!current) {
-      throw new BadRequestException('Cannot edit championship by #notFound');
-    }
+    const { keys, blankGames, gamePerKeys, keyNumber, ...rest } = payload;
 
     const toUpdate: any = { ...rest };
     if (gamePerKeys !== undefined) {
       toUpdate.gamePerKeys = parseInt(gamePerKeys) || 0;
     }
-    if (Object.keys(toUpdate).length) {
-      await this.championshipRepository.update(id, toUpdate);
+    if (keyNumber !== undefined) {
+      toUpdate.keyNumber = parseInt(keyNumber) || 0;
     }
 
-    const currentKeys = current.championshipKeys?.length || 0;
-    const nextKeys = keys !== undefined ? parseInt(keys) || 0 : currentKeys;
-    const nextGamePerKeys =
-      gamePerKeys !== undefined
-        ? parseInt(gamePerKeys) || 0
-        : current.gamePerKeys || 0;
-    const layoutChanged =
-      nextKeys !== currentKeys || nextGamePerKeys !== (current.gamePerKeys || 0);
-
-    if (layoutChanged && !current.started) {
-      const sumulas = await this.sumulasService.findAll({ championshipId });
-      await Promise.all(
-        sumulas.map((sumula) =>
-          this.sumulasService.remove({ id: sumula.id.toString() }),
-        ),
-      );
-      await this.championshipKeyRepository.delete({ championshipId });
-      await this.generateGames({
-        keys: nextKeys,
-        gamePerKeys: nextGamePerKeys,
-        blankGames: 0,
-        championshipId,
-      });
-    }
-
-    return { ok: true };
+    return this.championshipRepository.update(id, toUpdate);
   }
 
   buildRoundRobin(teams: Team[]): [Team, Team][] {
@@ -248,44 +212,69 @@ export class ChampionshipService {
       );
     }
 
-    let keys = championship.championshipKeys || [];
-    if (keys.length === 0) {
-      keys = [
-        await this.championshipKeyRepository.save({
+    // limpa qualquer chave/jogo gerado antes (re-start apos reset, dados antigos)
+    const existingSumulas = await this.sumulasService.findAll({ championshipId });
+    await Promise.all(
+      existingSumulas.map((sumula) =>
+        this.sumulasService.remove({ id: sumula.id.toString() }),
+      ),
+    );
+    await this.championshipKeyRepository.delete({ championshipId });
+
+    // nº de chaves vem da config do campeonato; no minimo 1 e no maximo
+    // floor(times / 2) pra cada chave ter pelo menos 2 times.
+    const wantedKeys = championship.keyNumber > 0 ? championship.keyNumber : 1;
+    const keyCount = Math.max(1, Math.min(wantedKeys, Math.floor(teams.length / 2)));
+
+    const keys = await Promise.all(
+      Array.from({ length: keyCount }, (_, index) =>
+        this.championshipKeyRepository.save({
           championshipId,
-          name: this.getNameKey(0),
+          name: this.getNameKey(index),
         }),
-      ];
-    }
-
-    // don't spread teams so thin that a key ends up with a single team (no game);
-    // cap the number of keys used so every key gets at least two teams.
-    const usableKeys =
-      keys.length > Math.floor(teams.length / 2)
-        ? keys.slice(0, Math.max(1, Math.floor(teams.length / 2)))
-        : keys;
-
-    const buckets: Team[][] = usableKeys.map(() => []);
-    teams.forEach((team, index) => {
-      buckets[index % usableKeys.length].push(team);
-    });
-
-    const sumulasToCreate: Partial<Sumula>[] = usableKeys.flatMap(
-      (key, keyIndex) =>
-        this.buildRoundRobin(buckets[keyIndex]).map(([teamA, teamB]) => ({
-          championshipId,
-          championshipKeysId: key.id,
-          teams: [teamA, teamB],
-        })),
+      ),
     );
 
-    await this.sumulasService.createManyWithTeams(sumulasToCreate);
+    const buckets: Team[][] = keys.map(() => []);
+    teams.forEach((team, index) => {
+      buckets[index % keyCount].push(team);
+    });
+
+    // fase de grupos: round-robin dentro de cada chave
+    const groupSumulas: Partial<Sumula>[] = keys.flatMap((key, keyIndex) =>
+      this.buildRoundRobin(buckets[keyIndex]).map(([teamA, teamB]) => ({
+        championshipId,
+        championshipKeysId: key.id,
+        teams: [teamA, teamB],
+      })),
+    );
+    await this.sumulasService.createManyWithTeams(groupSumulas);
+
+    // fase de enfrentamento (mata-mata): gera as sumulas em branco.
+    // classificados por chave = gamePerKeys, limitado ao tamanho da menor chave.
+    const smallestBucket = Math.min(...buckets.map((bucket) => bucket.length));
+    const classifiedPerKey = Math.min(
+      championship.gamePerKeys > 0 ? championship.gamePerKeys : 1,
+      smallestBucket,
+    );
+    const classified = keyCount * classifiedPerKey;
+    const knockoutGames = classified >= 2 ? classified - 1 : 0;
+
+    const knockoutSumulas: Partial<Sumula>[] = Array.from(
+      { length: knockoutGames },
+      () => ({ championshipId, championshipKeysId: null }),
+    );
+    if (knockoutSumulas.length) {
+      await this.sumulasService.createManyWithTeams(knockoutSumulas);
+    }
+
     await this.championshipRepository.update(id, { started: true });
 
     return {
       started: true,
-      keys: usableKeys.length,
-      games: sumulasToCreate.length,
+      keys: keyCount,
+      groupGames: groupSumulas.length,
+      knockoutGames,
     };
   }
 
