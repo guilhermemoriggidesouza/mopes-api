@@ -14,12 +14,52 @@ export class TeamService {
     @InjectConnection() private readonly connection: Connection,
   ) { }
 
-  async create(Team: Team, creatorId: number, orgId: number): Promise<Team> {
+  async create(Team: any, creator: any, orgId: number): Promise<Team> {
     if (orgId) {
       const org = await this.orgService.findOne({ id: orgId.toString() })
       Team.orgs = [org]
     }
-    return this.teamRepository.save({ ...Team, creatorId });
+
+    if (Team.championshipId) {
+      const championshipId = parseInt(Team.championshipId);
+      const [championship] = await this.connection.query(
+        'SELECT "categoryId" FROM championship WHERE id = $1',
+        [championshipId],
+      );
+      Team.championships = [{ id: championshipId }];
+      if (championship?.categoryId) {
+        Team.categoryId = championship.categoryId;
+      }
+      delete Team.championshipId;
+    }
+
+    if (creator?.role === Role.Coach) {
+      Team.coachs = [{ id: creator.id }];
+    }
+
+    return this.teamRepository.save({ ...Team, creatorId: creator?.id });
+  }
+
+  async findByChampionship(
+    championshipId: string,
+    orgId?: number,
+    creatorId?: number,
+  ): Promise<Team[]> {
+    const query = this.teamRepository
+      .createQueryBuilder('team')
+      .leftJoinAndSelect('team.orgs', 'orgs')
+      .leftJoinAndSelect('team.championships', 'championships')
+      .where('championships.id = :championshipId', { championshipId });
+
+    if (orgId) {
+      query.andWhere('orgs.id = :orgId', { orgId });
+    }
+
+    if (creatorId) {
+      query.andWhere('team.creatorId = :creatorId', { creatorId });
+    }
+
+    return query.getMany();
   }
 
   async findAll(where?: any): Promise<Team[]> {

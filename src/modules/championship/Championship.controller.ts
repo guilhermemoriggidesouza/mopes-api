@@ -24,9 +24,9 @@ export class ChampionshipController {
   constructor(private readonly championshipService: ChampionshipService) {}
 
   @Get(`${urlBase}`)
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Coach)
   async findAllChampionships(@Request() req: any): Promise<Championship[]> {
-    return await this.championshipService.findAll({ ownerId: req.user?.id });
+    return await this.championshipService.findAll();
   }
 
   @Get(`championshipKeys`)
@@ -38,7 +38,7 @@ export class ChampionshipController {
   }
 
   @Get(`${urlBase}/:id`)
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Coach)
   async findOne(@Param('id') id: string): Promise<Championship> {
     return await this.championshipService.findOne({
       id,
@@ -49,6 +49,12 @@ export class ChampionshipController {
   @Roles(Role.Admin)
   async start(@Param('id') id: string): Promise<any> {
     return await this.championshipService.startChampionship({ id });
+  }
+
+  @Put(`${urlBase}/:id/reset`)
+  @Roles(Role.Admin)
+  async reset(@Param('id') id: string): Promise<any> {
+    return await this.championshipService.resetChampionship({ id });
   }
 
   @Post(`${urlBase}`)

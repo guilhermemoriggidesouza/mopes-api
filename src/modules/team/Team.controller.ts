@@ -30,12 +30,21 @@ export class TeamController {
     @Request() req: any,
     @Query('userId') userId?: string,
     @Query('role') role?: string,
+    @Query('championshipId') championshipId?: string,
   ): Promise<Team[]> {
     if (userId && role) {
       return await this.teamService.findByUserRole(userId, role as Role, req.user.orgId);
     }
 
-    return await this.teamService.findAll({ where: { orgs: [req.user.orgId] } });
+    if (championshipId) {
+      return await this.teamService.findByChampionship(
+        championshipId,
+        req.user.orgId,
+        req.user.role === Role.Coach ? req.user.id : undefined,
+      );
+    }
+
+    return await this.teamService.findAll();
   }
 
   @Get(`${urlBase}/:id`)
@@ -54,9 +63,9 @@ export class TeamController {
   }
 
   @Post(`${urlBase}`)
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Coach)
   async createTeam(@Body() payload: Team, @Request() req: any): Promise<Team> {
-    return await this.teamService.create(payload, req.user.id, req.user.orgId);
+    return await this.teamService.create(payload, req.user, req.user.orgId);
   }
 
   @Put(`${urlBase}/:id`)

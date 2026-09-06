@@ -47,6 +47,13 @@ export class SumulaService {
       .execute();
   }
 
+  async createManyWithTeams(sumulas: Partial<Sumula>[]): Promise<Sumula[]> {
+    if (!sumulas.length) {
+      return [];
+    }
+    return this.sumulaRepository.save(sumulas.map((sumula) => ({ ...sumula })));
+  }
+
   async findAll(where?: any, relations?: any): Promise<Sumula[]> {
     return this.sumulaRepository.find({
       relations: relations || [

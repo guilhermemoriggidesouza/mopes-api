@@ -23,7 +23,7 @@ export class CategoryGameController {
   constructor(private readonly CategoryGameService: CategoryGameService) {}
 
   @Get(`${urlBase}`)
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Coach)
   async findAllCategoryGames(): Promise<CategoryGame[]> {
     return await this.CategoryGameService.findAll();
   }
