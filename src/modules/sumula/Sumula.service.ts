@@ -96,13 +96,14 @@ export class SumulaService {
     sumulaId: number,
   ): Promise<players[]> {
     const players = await this.connection.query(`
-      SELECT pl.id, pl."userId", us.name as "userName", pl.infractions, pl."teamId", pl.name, pin.id as "playerInMatchId", pin."sumulaId", coalesce(SUM(sg.point),0) as points, coalesce(SUM(sg.fault), 0) as faults
-      FROM player pl 
-      LEFT JOIN player_in_match pin ON pl.id = pin."playerId" AND pin."sumulaId" = ${sumulaId} 
+      SELECT pl.id, pl."userId", us.name as "userName", coalesce(pin.infractions, 0) as infractions, ptt."teamId", pl.name, pin.id as "playerInMatchId", pin."sumulaId", coalesce(SUM(sg.point),0) as points, coalesce(SUM(sg.fault), 0) as faults
+      FROM player pl
+      INNER JOIN player_teams_team ptt ON ptt."playerId" = pl.id
+      LEFT JOIN player_in_match pin ON pl.id = pin."playerId" AND pin."sumulaId" = ${sumulaId}
       LEFT JOIN status_game sg ON pin.id = sg."playerInMatchId"
       INNER JOIN public."user" us ON us.id = pl."userId"
-      WHERE pl."teamId" in (${teams.join(',')})      
-      group by pl.name, pin.id, pin."sumulaId", pl.id, pl."userId", pl.infractions, pl."teamId", us.name
+      WHERE ptt."teamId" in (${teams.join(',')})
+      group by pl.name, pin.id, pin."sumulaId", pl.id, pl."userId", pin.infractions, ptt."teamId", us.name
     `);
     return players;
   }
