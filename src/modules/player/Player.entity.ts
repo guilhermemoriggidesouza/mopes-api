@@ -12,7 +12,6 @@ import {
   RelationId,
   OneToMany,
   ManyToMany,
-  JoinTable,
 } from 'typeorm';
 
 @Entity()
@@ -30,8 +29,7 @@ export class Player {
   @Column({ nullable: true })
   userId?: number;
 
-  @ManyToMany(() => Team)
-  @JoinTable()
+  @ManyToMany(() => Team, (team) => team.players)
   teams?: Team[];
 
   @OneToMany(() => PlayerInMatch, (PIM) => PIM.player)

@@ -308,34 +308,4 @@ export class ChampionshipService {
     };
   }
 
-  unifiqueArray(arrayToUnify: any[]) {
-    return arrayToUnify.filter((value, index) => {
-      const _value = JSON.stringify(value);
-      return (
-        index ===
-        arrayToUnify.findIndex((obj) => {
-          return JSON.stringify(obj) === _value;
-        })
-      );
-    });
-  }
-
-  async syncTeamChampionship({ championshipId }: { championshipId: number }) {
-    const championship = await this.championshipRepository.findOne(
-      championshipId,
-      {
-        relations: [
-          'championshipKeys',
-          'championshipKeys.sumulas',
-          'championshipKeys.sumulas.teams',
-        ],
-      },
-    );
-    championship.teams = this.unifiqueArray([
-      ...championship.championshipKeys.flatMap((champKey) => {
-        return champKey.sumulas.flatMap((sumula) => sumula.teams);
-      }),
-    ]);
-    return this.championshipRepository.save({ ...championship });
-  }
 }

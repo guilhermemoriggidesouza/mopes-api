@@ -1,8 +1,9 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
 import { Connection, In, Repository } from 'typeorm';
 import { Player } from './Player.entity';
 import { TeamService } from '../team/Team.service';
+import { Team } from '../team/Team.entity';
 
 @Injectable()
 export class PlayerService {
@@ -65,8 +66,14 @@ export class PlayerService {
 
   async addTeam({ teamId, id }: { id: string, teamId: string }): Promise<any> {
     const player = await this.playerRepository.findOne(id, { relations: ["teams"] })
+    if (!player) throw new NotFoundException('Jogador não encontrado')
     const team = await this.teamsService.findOne({ id: teamId, withoutRelations: true })
-    player.teams.push(team)
-    await this.playerRepository.save(player);
+    if (!team) throw new NotFoundException('Time não encontrado')
+    if (player.teams?.some((t) => String(t.id) === String(team.id))) return
+    await this.playerRepository
+      .createQueryBuilder()
+      .relation(Team, 'players')
+      .of(team)
+      .add(player);
   }
 }

@@ -55,11 +55,11 @@ export class Team {
   @JoinTable()
   orgs: Org[];
 
-  @ManyToMany(() => Championship)
+  @ManyToMany(() => Championship, (championship) => championship.teams)
   @JoinTable()
   championships: Championship[];
 
-  @ManyToMany(() => Player)
+  @ManyToMany(() => Player, (player) => player.teams)
   @JoinTable()
   players: Player[];
 

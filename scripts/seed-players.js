@@ -3,8 +3,8 @@
  * Seed manual: garante pelo menos N jogadores em cada team existente.
  *
  * Para cada jogador criado, cria tambem um `user` (o app faz INNER JOIN em user
- * ao montar o status do jogo) e liga o jogador ao time nas duas tabelas de
- * juncao usadas pelo projeto (player_teams_team / team_players_player).
+ * ao montar o status do jogo) e liga o jogador ao time na tabela de
+ * juncao usada pelo projeto (team_players_player).
  *
  * Uso: npm run seed:players
  * Requer DATABASE_URL no .env.
@@ -40,7 +40,7 @@ function randomName() {
 
 async function countTeamPlayers(client, teamId) {
   const res = await client.query(
-    'SELECT COUNT(*)::int AS n FROM player_teams_team WHERE "teamId" = $1',
+    'SELECT COUNT(*)::int AS n FROM team_players_player WHERE "teamId" = $1',
     [teamId],
   );
   return res.rows[0].n;
@@ -56,7 +56,7 @@ async function createPlayerForTeam(client, team, index, passwordHash) {
     `INSERT INTO "user" ("name", "login", "email", "rg", "password", "role")
      VALUES ($1, $2, $3, '', $4, 'player')
      RETURNING id`,
-    [name, login, email, passwordHash],
+    [name, N, email, passwordHash],
   );
   const userId = userRes.rows[0].id;
 
@@ -66,11 +66,6 @@ async function createPlayerForTeam(client, team, index, passwordHash) {
   );
   const playerId = playerRes.rows[0].id;
 
-  await client.query(
-    `INSERT INTO player_teams_team ("playerId", "teamId") VALUES ($1, $2)
-     ON CONFLICT DO NOTHING`,
-    [playerId, team.id],
-  );
   await client.query(
     `INSERT INTO team_players_player ("teamId", "playerId") VALUES ($1, $2)
      ON CONFLICT DO NOTHING`,

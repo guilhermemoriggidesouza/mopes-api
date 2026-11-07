@@ -98,7 +98,7 @@ export class SumulaService {
     const players = await this.connection.query(`
       SELECT pl.id, pl."userId", us.name as "userName", coalesce(pin.infractions, 0) as infractions, ptt."teamId", pl.name, pin.id as "playerInMatchId", pin."sumulaId", coalesce(SUM(sg.point),0) as points, coalesce(SUM(sg.fault), 0) as faults
       FROM player pl
-      INNER JOIN player_teams_team ptt ON ptt."playerId" = pl.id
+      INNER JOIN team_players_player ptt ON ptt."playerId" = pl.id
       LEFT JOIN player_in_match pin ON pl.id = pin."playerId" AND pin."sumulaId" = ${sumulaId}
       LEFT JOIN status_game sg ON pin.id = sg."playerInMatchId"
       INNER JOIN public."user" us ON us.id = pl."userId"
@@ -228,9 +228,6 @@ export class SumulaService {
       });
     }
     await this.sumulaRepository.save(sumula);
-    await this.championshipService.syncTeamChampionship({
-      championshipId: sumula.championshipId,
-    });
     return sumula;
   }
 

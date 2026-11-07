@@ -10,7 +10,6 @@ import {
   JoinColumn,
   ManyToOne,
   ManyToMany,
-  JoinTable,
 } from 'typeorm';
 import { Sumula } from 'src/modules/sumula/entities/Sumula.entity';
 import { ChampionshipKeys } from './ChampionshipKeys.entity';
@@ -39,8 +38,7 @@ export class Championship {
   @Column({ nullable: true })
   orgId?: number;
 
-  @ManyToMany(() => Team)
-  @JoinTable()
+  @ManyToMany(() => Team, (team) => team.championships)
   teams: Team[];
 
   @Column({ default: false })
