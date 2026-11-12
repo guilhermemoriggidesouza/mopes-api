@@ -3,17 +3,17 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './User.entity';
-import { PlayerService } from './../player/Player.service';
 import { Player } from '../player/Player.entity';
 import { hash, genSalt } from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(
-    private playerService: PlayerService,
     private readonly jwtService: JwtService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Player)
+    private readonly playerRepository: Repository<Player>,
   ) { }
 
   async create(UserRequest: User): Promise<User> {
@@ -30,7 +30,7 @@ export class UserService {
     UserRequest.password = await hash(UserRequest.password, (await genSalt()));
     const userInserted = await this.userRepository.save(UserRequest);
     if (UserRequest.role == 'player') {
-      player = await this.playerService.create({ name: UserRequest.name, userId: userInserted.id });
+      player = await this.playerRepository.save({ name: UserRequest.name, userId: userInserted.id });
     }
     this.userRepository.update(userInserted.id, { playerId: player?.id });
     return UserRequest;

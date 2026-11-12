@@ -2,21 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { Team } from './Team.entity';
-import { OrgService } from '../org/Org.service';
+import { Org } from '../org/Org.entity';
 import { Role } from 'src/infra/role.enum';
 
 @Injectable()
 export class TeamService {
   constructor(
-    private orgService: OrgService,
     @InjectRepository(Team)
     private teamRepository: Repository<Team>,
+    @InjectRepository(Org)
+    private orgRepository: Repository<Org>,
     @InjectConnection() private readonly connection: Connection,
   ) { }
 
   async create(Team: any, creator: any, orgId: number): Promise<Team> {
     if (orgId) {
-      const org = await this.orgService.findOne({ id: orgId.toString() })
+      const org = await this.orgRepository.findOne(orgId, {
+        relations: ['teams', 'championships'],
+      })
       Team.orgs = [org]
     }
 
@@ -87,10 +90,10 @@ export class TeamService {
     return query.getMany();
   }
 
-  async findOne({ id, where, withoutRelations = false }: { id?: string; where?: any, withoutRelations?: Boolean }): Promise<Team> {
+  async findOne({ id, where }: { id?: string; where?: any }): Promise<Team> {
     return this.teamRepository.findOne(id, {
       where,
-      relations: !withoutRelations ? ['players', 'coachs'] : undefined,
+      relations: ['players', 'coachs'],
     });
   }
 

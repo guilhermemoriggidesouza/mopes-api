@@ -1,5 +1,4 @@
 import { PlayerInMatch } from 'src/modules/sumula/entities/PlayerInMatch.entity';
-import { Sumula } from 'src/modules/sumula/entities/Sumula.entity';
 import { Team } from 'src/modules/team/Team.entity';
 import { User } from 'src/modules/user/User.entity';
 import {
@@ -8,8 +7,6 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
-  ManyToOne,
-  RelationId,
   OneToMany,
   ManyToMany,
 } from 'typeorm';

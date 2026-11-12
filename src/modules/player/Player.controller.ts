@@ -1,19 +1,7 @@
 import { RolesGuard } from '../../infra/role.guard';
 import { Roles } from '../../infra/role.decorators';
 import { Role } from '../../infra/role.enum';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  Req,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Put, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { Player } from './Player.entity';
 import { PlayerService } from './Player.service';

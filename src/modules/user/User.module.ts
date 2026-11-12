@@ -5,12 +5,11 @@ import { UserService } from './User.service';
 import { User } from './User.entity';
 import { JwtModule } from '@nestjs/jwt';
 import config from 'src/config';
-import { PlayerModule } from '../player/Player.module';
+import { Player } from '../player/Player.entity';
 
 @Module({
   imports: [
-    PlayerModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Player]),
     JwtModule.register({
       secret: config.secret_key,
       signOptions: { expiresIn: '60s' },

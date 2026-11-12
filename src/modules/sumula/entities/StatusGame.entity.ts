@@ -8,12 +8,12 @@ export class StatusGame {
   @PrimaryGeneratedColumn()
   id?: number;
 
-  @ManyToOne(() => PlayerInMatch)
+  @ManyToOne(() => PlayerInMatch, { onDelete: 'CASCADE' })
   playerInMatch?: PlayerInMatch;
   @Column({ nullable: true })
   playerInMatchId?: number;
 
-  @ManyToOne(() => Sumula)
+  @ManyToOne(() => Sumula, { onDelete: 'CASCADE' })
   sumula: Sumula;
   @Column()
   sumulaId: number;

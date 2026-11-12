@@ -4,10 +4,7 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToOne,
   OneToMany,
-  JoinColumn,
-  JoinTable,
   ManyToMany,
 } from 'typeorm';
 import { Championship } from '../championship/entities/Championship.entity';

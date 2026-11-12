@@ -10,7 +10,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';

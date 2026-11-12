@@ -8,7 +8,6 @@ import {
   Get,
   Param,
   Post,
-  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';

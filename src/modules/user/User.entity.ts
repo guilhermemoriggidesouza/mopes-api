@@ -8,7 +8,6 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { Championship } from 'src/modules/championship/entities/Championship.entity';
 

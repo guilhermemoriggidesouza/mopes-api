@@ -1,11 +1,5 @@
-import {
-  Injectable,
-  BadRequestException,
-  forwardRef,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { SumulaService } from 'src/modules/sumula/Sumula.service';
 import { Team } from 'src/modules/team/Team.entity';
 import { Connection, Repository } from 'typeorm';
 import { Sumula } from 'src/modules/sumula/entities/Sumula.entity';
@@ -22,8 +16,8 @@ export class ChampionshipService {
     @InjectRepository(ChampionshipKeys)
     private readonly championshipKeyRepository: Repository<ChampionshipKeys>,
 
-    @Inject(forwardRef(() => SumulaService))
-    private readonly sumulasService: SumulaService,
+    @InjectRepository(Sumula)
+    private readonly sumulaRepository: Repository<Sumula>,
 
     @InjectConnection()
     private readonly connection: Connection,
@@ -34,66 +28,6 @@ export class ChampionshipService {
       return NAME_KEYS[index];
     }
     return NAME_KEYS[index] + index;
-  }
-
-  createArray(number) {
-    return Array.from({ length: number }, (_, i) => i + 1);
-  }
-
-  async generateSumulas({
-    championshipId,
-    gamePerKeys,
-    blankGames,
-    championshipKeys,
-  }: {
-    championshipId: number;
-    gamePerKeys: number;
-    blankGames: number;
-    championshipKeys: any[];
-  }) {
-    const sumulasToCreate: any = championshipKeys.map((championshipKey) =>
-      this.createArray(gamePerKeys).map(() => ({
-        championshipId,
-        championshipKeysId: championshipKey.id,
-      })),
-    );
-    sumulasToCreate.push(
-      this.createArray(blankGames).map(() => ({
-        championshipId,
-      })),
-    );
-    return this.sumulasService.createMany(sumulasToCreate.flat());
-  }
-
-  async generateGames({
-    keys,
-    gamePerKeys,
-    blankGames,
-    championshipId,
-  }: {
-    keys: number;
-    gamePerKeys: number;
-    blankGames: number;
-    championshipId: number;
-  }) {
-    if (keys > 0) {
-      const createdKeys = await Promise.all(
-        this.createArray(keys).map(async (key, index) => {
-          return this.championshipKeyRepository.save({
-            championshipId,
-            name: this.getNameKey(index),
-          });
-        }),
-      );
-      if (gamePerKeys > 0) {
-        await this.generateSumulas({
-          championshipId,
-          gamePerKeys,
-          blankGames,
-          championshipKeys: createdKeys,
-        });
-      }
-    }
   }
 
   async create(championship: any, ownerId: number): Promise<any> {
@@ -134,25 +68,15 @@ export class ChampionshipService {
         'championshipKeys.sumulas.teams',
       ],
     });
-    championship.sumulas = await this.sumulasService.findAll(
-      {
-        championshipKeysId: null,
-        championshipId: id,
-      },
-      ['teams'],
-    );
+    championship.sumulas = await this.sumulaRepository.find({
+      where: { championshipKeysId: null, championshipId: id },
+      relations: ['teams'],
+    });
     return championship;
   }
 
   async remove(id: string): Promise<any> {
-    const sumulas = await this.sumulasService.findAll({
-      championshipId: parseInt(id),
-    });
-    await Promise.all(
-      sumulas.map((sumula) =>
-        this.sumulasService.remove({ id: sumula.id.toString() }),
-      ),
-    );
+    await this.sumulaRepository.delete({ championshipId: parseInt(id) });
     await this.championshipKeyRepository.delete({
       championshipId: parseInt(id),
     });
@@ -213,12 +137,7 @@ export class ChampionshipService {
     }
 
     // limpa qualquer chave/jogo gerado antes (re-start apos reset, dados antigos)
-    const existingSumulas = await this.sumulasService.findAll({ championshipId });
-    await Promise.all(
-      existingSumulas.map((sumula) =>
-        this.sumulasService.remove({ id: sumula.id.toString() }),
-      ),
-    );
+    await this.sumulaRepository.delete({ championshipId });
     await this.championshipKeyRepository.delete({ championshipId });
 
     // nº de chaves vem da config do campeonato; no minimo 1 e no maximo
@@ -248,7 +167,9 @@ export class ChampionshipService {
         teams: [teamA, teamB],
       })),
     );
-    await this.sumulasService.createManyWithTeams(groupSumulas);
+    if (groupSumulas.length) {
+      await this.sumulaRepository.save(groupSumulas);
+    }
 
     // fase de enfrentamento (mata-mata): gera as sumulas em branco.
     // classificados por chave = gamePerKeys, limitado ao tamanho da menor chave.
@@ -265,7 +186,7 @@ export class ChampionshipService {
       () => ({ championshipId, championshipKeysId: null }),
     );
     if (knockoutSumulas.length) {
-      await this.sumulasService.createManyWithTeams(knockoutSumulas);
+      await this.sumulaRepository.save(knockoutSumulas);
     }
 
     await this.championshipRepository.update(id, { started: true });
@@ -292,19 +213,14 @@ export class ChampionshipService {
       throw new BadRequestException('Cannot reset championship by #notFound');
     }
 
-    const sumulas = await this.sumulasService.findAll({ championshipId });
-    await Promise.all(
-      sumulas.map((sumula) =>
-        this.sumulasService.remove({ id: String(sumula.id) }),
-      ),
-    );
+    const { affected } = await this.sumulaRepository.delete({ championshipId });
 
     await this.championshipKeyRepository.delete({ championshipId });
     await this.championshipRepository.update(id, { started: false });
 
     return {
       started: false,
-      removedGames: sumulas.length,
+      removedGames: affected ?? 0,
     };
   }
 

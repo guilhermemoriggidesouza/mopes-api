@@ -15,7 +15,7 @@ export class PlayerInMatch {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Sumula)
+  @ManyToOne(() => Sumula, { onDelete: 'CASCADE' })
   sumula: Sumula;
   @Column()
   sumulaId: number;

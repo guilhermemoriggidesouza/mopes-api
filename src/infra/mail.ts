@@ -1,5 +1,4 @@
 import * as nodemailer from 'nodemailer';
-import { Subject } from 'rxjs';
 import config from '../config';
 
 class Mail {

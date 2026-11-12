@@ -5,17 +5,13 @@ import { Module } from '@nestjs/common';
 import { SumulaController } from './Sumula.controller';
 import { SumulaService } from './Sumula.service';
 import { Sumula } from './entities/Sumula.entity';
-import { PlayerModule } from '../player/Player.module';
+import { Player } from '../player/Player.entity';
 import { StatusGame } from './entities/StatusGame.entity';
-import { TeamModule } from 'src/modules/team/Team.module';
-import { ChampionshipModule } from 'src/modules/championship/Championship.module';
+import { Team } from 'src/modules/team/Team.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Sumula, PlayerInMatch, StatusGame]),
-    PlayerModule,
-    TeamModule,
-    ChampionshipModule,
+    TypeOrmModule.forFeature([Sumula, PlayerInMatch, StatusGame, Player, Team]),
   ],
   controllers: [SumulaController],
   providers: [SumulaService, SumulaGateway],

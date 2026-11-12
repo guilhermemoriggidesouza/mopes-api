@@ -1,23 +1,11 @@
-import { PlayerService } from '../player/Player.service';
+import { Player } from '../player/Player.entity';
 import { PlayerInMatch } from 'src/modules/sumula/entities/PlayerInMatch.entity';
 import { StatusGame } from './entities/StatusGame.entity';
 import { Team } from 'src/modules/team/Team.entity';
-import {
-  Dependencies,
-  Injectable,
-  BadRequestException,
-  forwardRef,
-  Inject,
-} from '@nestjs/common';
-import {
-  getRepositoryToken,
-  InjectConnection,
-  InjectRepository,
-} from '@nestjs/typeorm';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, In, Repository } from 'typeorm';
 import { Sumula } from './entities/Sumula.entity';
-import { TeamService } from 'src/modules/team/Team.service';
-import { ChampionshipService } from 'src/modules/championship/Championship.service';
 import { Server } from 'socket.io';
 
 @Injectable()
@@ -29,29 +17,15 @@ export class SumulaService {
     private readonly playerInMatchRepository: Repository<PlayerInMatch>,
     @InjectRepository(StatusGame)
     private readonly statusGameRepository: Repository<StatusGame>,
-
-    private readonly playerService: PlayerService,
-    private readonly teamsService: TeamService,
-    private readonly championshipService: ChampionshipService,
+    @InjectRepository(Player)
+    private readonly playerRepository: Repository<Player>,
+    @InjectRepository(Team)
+    private readonly teamRepository: Repository<Team>,
     @InjectConnection() private readonly connection: Connection,
   ) { }
 
   async create(sumula: Sumula): Promise<Sumula> {
     return this.sumulaRepository.save({ ...sumula });
-  }
-  async createMany(sumulas: Sumula[]): Promise<any> {
-    return this.sumulaRepository
-      .createQueryBuilder()
-      .insert()
-      .values(sumulas)
-      .execute();
-  }
-
-  async createManyWithTeams(sumulas: Partial<Sumula>[]): Promise<Sumula[]> {
-    if (!sumulas.length) {
-      return [];
-    }
-    return this.sumulaRepository.save(sumulas.map((sumula) => ({ ...sumula })));
   }
 
   async findAll(where?: any, relations?: any): Promise<Sumula[]> {
@@ -179,10 +153,6 @@ export class SumulaService {
     sender.emit(`alert:${sumulaId}`, messages);
   }
 
-  createArray(number) {
-    return Array.from({ length: number }, (_, i) => i + 1);
-  }
-
   async getGameStatus({ id }: { id: string }): Promise<gameStatus> {
     const sumulaInfos = await this.sumulaRepository.findOne(id, {
       relations: [
@@ -213,9 +183,7 @@ export class SumulaService {
   }
 
   async remove({ id, where }: { id?: string; where?: any }): Promise<any> {
-    console.log(id);
-    await this.statusGameRepository.delete({ sumulaId: parseInt(id) });
-    await this.playerInMatchRepository.delete({ sumulaId: parseInt(id) });
+    // status_game e player_in_match caem junto via ON DELETE CASCADE
     return await this.sumulaRepository.delete(id || where);
   }
 
@@ -223,8 +191,9 @@ export class SumulaService {
     const sumula = await this.sumulaRepository.findOne(id);
     if (payload.teams) {
       const ids = payload.teams.map((id) => parseInt(id));
-      sumula.teams = await this.teamsService.findAll({
-        id: In(ids),
+      sumula.teams = await this.teamRepository.find({
+        where: { id: In(ids) },
+        relations: ['championships', 'orgs'],
       });
     }
     await this.sumulaRepository.save(sumula);
@@ -290,7 +259,9 @@ export class SumulaService {
     ) {
       throw new BadRequestException('PLAYERNOTINTEAM');
     }
-    const player = await this.playerService.findOne({ id: payload.playerId });
+    const player = await this.playerRepository.findOne(payload.playerId, {
+      relations: ['user', 'teams'],
+    });
     if (playerInMatch.infractions >= category.maxInfractionPerPlayer) {
       throw new BadRequestException('MAXINFRACTIONS');
     }

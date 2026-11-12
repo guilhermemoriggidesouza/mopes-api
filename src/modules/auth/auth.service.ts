@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserService } from '../user/User.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../user/User.entity';
 import { JwtService } from '@nestjs/jwt';
 import mail, { MESSAGES } from '../../infra/mail';
 import { compare } from 'bcrypt';
@@ -7,12 +9,16 @@ import { compare } from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) { }
 
   async login(login: string, pass: string): Promise<any> {
-    const user = await this.userService.findOne({ where: { login } });
+    const user = await this.userRepository.findOne({
+      where: { login },
+      relations: ['org', 'teamsCreated'],
+    });
     const isSamePass = await compare(pass, user.password)
     if (user && isSamePass) {
       const { password, teamsCreated, ...result } = user;
@@ -26,7 +32,10 @@ export class AuthService {
   }
 
   async recoverPass(email: string, origin: string): Promise<any> {
-    const user = await this.userService.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['org', 'teamsCreated'],
+    });
     if (!user) {
       throw new BadRequestException('EMAILDONTFIND');
     }

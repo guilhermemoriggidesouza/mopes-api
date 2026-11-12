@@ -1,14 +1,5 @@
 import { AuthService } from './auth.service';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
 import { User } from 'src/modules/user/User.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UserService } from '../user/User.service';

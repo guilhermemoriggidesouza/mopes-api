@@ -1,4 +1,4 @@
-import AWS, { S3 } from 'aws-sdk';
+import { S3 } from 'aws-sdk';
 import configEnv from '../config';
 
 const isLocal = process.env.NODE_ENV === 'development';

@@ -1,4 +1,3 @@
-import { PlayerService } from '../player/Player.service';
 import { PlayerInMatch } from 'src/modules/sumula/entities/PlayerInMatch.entity';
 import { RolesGuard } from '../../infra/role.guard';
 import { Roles } from '../../infra/role.decorators';
@@ -11,15 +10,12 @@ import {
   Param,
   Post,
   Put,
-  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { Sumula } from './entities/Sumula.entity';
 import { SumulaService } from './Sumula.service';
-import { Server } from 'socket.io';
-import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { SumulaGateway } from './Sumula.gateway';
 const urlBase = '/sumula';
 

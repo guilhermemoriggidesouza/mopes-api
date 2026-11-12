@@ -1,19 +1,4 @@
-import { RolesGuard } from '../../infra/role.guard';
-import { Roles } from '../../infra/role.decorators';
-import { Role } from '../../infra/role.enum';
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Query,
-  Req,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { FileService } from './File.service';
 const urlBase = '/file';
 
